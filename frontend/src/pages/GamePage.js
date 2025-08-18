@@ -4,10 +4,10 @@ import { getCurrentUser } from '../utils/helpers';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 import { toast } from 'react-toastify';
 
-import MeteoriteGuardian from '../games/MeteoriteGuardian';
-import CuocDuaXuyenKhong from '../games/CuocDuaXuyenKhong';
-import PhongTuyenNganHa from '../games/PhongTuyenNganHa';
-import BanMayBayToanHoc from '../games/BanMayBayToanHoc';
+import MeteoriteGuardian from '../components/games/MeteoriteGuardian';
+import CuocDuaXuyenKhong from '../components/games/CuocDuaXuyenKhong';
+import PhongTuyenNganHa from '../components/games/PhongTuyenNganHa';
+import BanMayBayToanHoc from '../components/games/BanMayBayToanHoc';
 
 // 2. Định nghĩa danh sách game
 const GAMES = [

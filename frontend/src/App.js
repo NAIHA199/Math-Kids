@@ -8,7 +8,6 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AuthenticatedHomePage from './pages/AuthenticatedHomePage';
-import Dashboard from './pages/Dashboard';
 import LessonPage from './pages/LessonPage';
 import GamePage from './pages/GamePage';
 import RewardPage from './pages/RewardPage';
@@ -77,9 +76,7 @@ function App() {
           
           <Route path="/games" element={
             <ProtectedRoute>
-              <Dashboard userType="student">
-                <GamePage />
-              </Dashboard>
+              <GamePage />
             </ProtectedRoute>
           } />
           
