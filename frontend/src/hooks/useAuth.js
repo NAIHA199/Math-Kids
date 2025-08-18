@@ -7,14 +7,27 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      //await new Promise(resolve => setTimeout(resolve, 2000));
+      const res = await fetch('http://127.0.0.1:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          userType,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(JSON.stringify(data));
+      }      
+
       // Mock successful login
-      localStorage.setItem('user', JSON.stringify({
-        username,
-        userType,
-        token: 'mock-token-123'
-      }));
+      // Lưu token và user vào localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
       
       return { success: true };
     } catch (error) {
@@ -24,12 +37,28 @@ export const useAuth = () => {
     }
   }, []);
 
-  const register = useCallback(async ({ username, password, email, fullName, userType }) => {
+  const register = useCallback(async ({ userType, fullName, email, username, password }) => {
     setIsLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      //await new Promise(resolve => setTimeout(resolve, 2000));
+      const res = await fetch('http://127.0.0.1:8000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          username,
+          password,
+          userType,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, errors: data.errors || data };
+      }
       // Mock successful registration
       return { success: true };
     } catch (error) {

@@ -4,15 +4,25 @@ import { FaUser, FaLock, FaRocket, FaArrowLeft, FaEnvelope, FaPhone } from 'reac
 import { Link } from 'react-router-dom';
 import ControlPanel from './ControlPanel';
 import FuelGauge from './FuelGauge';
+import { useEffect } from 'react';
 
 const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'login' }) => {
+  useEffect(() => {
+    // Xét role
+    if (accountType?.id) {
+      setFormData(prev => ({
+        ...prev,
+        userType: accountType.id
+      }));
+    }
+  }, [accountType]);
   const [formData, setFormData] = useState({ 
+    userType: '',
+    fullName: '',
+    email: '',
     username: '', 
     password: '',
-    confirmPassword: '',
-    email: '',
-    phone: '',
-    fullName: ''
+    password_confirmation: '',
   });
   const [errors, setErrors] = useState({});
   const [fuel, setFuel] = useState(0);
@@ -39,7 +49,7 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
       if (data.email.includes('@')) fuelLevel += 20;
       // Remove phone requirement for parents
       if (data.password.length >= 6) fuelLevel += 20;
-      if (data.password === data.confirmPassword && data.password.length >= 6) fuelLevel += 20;
+      if (data.password === data.password_confirmation && data.password.length >= 6) fuelLevel += 20;
     }
     
     return fuelLevel;
@@ -65,8 +75,8 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
     if (formType === 'register') {
       if (!formData.email) newErrors.email = 'Cần email!';
       // Remove phone validation for parents
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp!';
+      if (formData.password !== formData.password_confirmation) {
+        newErrors.password_confirmation = 'Mật khẩu xác nhận không khớp!';
       }
     }
     
@@ -190,11 +200,11 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
                 <ControlPanel
                   icon={<FaLock />}
                   label="Xác nhận mật khẩu"
-                  name="confirmPassword"
+                  name="password_confirmation"
                   type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => updateField('confirmPassword', e.target.value)}
-                  error={errors.confirmPassword}
+                  value={formData.password_confirmation}
+                  onChange={(e) => updateField('password_confirmation', e.target.value)}
+                  error={errors.password_confirmation}
                   placeholder="Nhập lại mật khẩu"
                 />
               )}
