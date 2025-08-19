@@ -22,7 +22,7 @@ const AuthenticatedHomePage = () => {
 
   // Render content based on user type
   const renderContent = () => {
-    switch(user?.userType) {
+    switch(user?.role) {
       case 'student':
         return <StudentHome user={user} />;
       case 'teacher':

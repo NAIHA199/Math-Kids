@@ -12,6 +12,14 @@ class RegisterRequest extends FormRequest
         return true; // Cho phép tất cả user đăng kí
     }
 
+    // Chuyển đổi userType thành role
+    /*public function prepareForValidation()
+    {
+        if ($this->has('userType')) {
+            $this->merge(['role' => $this->input('userType')]);
+        }
+    }*/
+
     public function rules(): array // Nhận role từ front-end
     {
         return [

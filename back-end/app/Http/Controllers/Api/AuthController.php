@@ -21,6 +21,7 @@ class AuthController extends Controller
     // Đăng ký (tạo user mới đưa dữ liệu vào db)
     public function register(RegisterRequest $request): JsonResponse
     {
+
         $user = User::create([
             'role' => $request['role'],
             'fullName' => $request['fullName'],
@@ -47,9 +48,10 @@ class AuthController extends Controller
         if (!Auth::attempt($credentials)) {
             return response()->json(['message' => 'Tên đăng nhập hoặc mật khẩu không đúng'], 401);
         }
+        /*//Đổi userType -> role
         if($request->has('userType')) {
             $request->merge(['role' => $request->userType]);
-        }
+        }*/
         //Tạo token
         $user = Auth::user();
         $token = $user->createToken('api-token')->plainTextToken;
@@ -61,7 +63,7 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
-                'userType' => $user->role,
+                'role' => $user->role,
                 'fullName' => $user->fullName,
                 'email' => $user->email
             ]

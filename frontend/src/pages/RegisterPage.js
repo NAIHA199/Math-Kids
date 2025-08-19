@@ -31,7 +31,7 @@ const RegisterPage = () => {
       setCurrentStep('launch');
       await register({
         ...data,
-        userType: selectedAccountType.id
+        role: selectedAccountType.id
       });
       
       toast.success('🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục!');

@@ -7,7 +7,7 @@ import TeacherDashboard from '../components/dashboard/TeacherDashboard';
 import ParentDashboard from '../components/dashboard/ParentDashboard';
 import Loading from '../components/common/Loading';
 
-const Dashboard = ({ userType }) => {
+const Dashboard = ({ role }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,14 +20,14 @@ const Dashboard = ({ userType }) => {
       return;
     }
 
-    // Set user với userType từ props hoặc từ localStorage
+    // Set user với role từ props hoặc từ localStorage
     setUser({
       ...currentUser,
-      userType: userType || currentUser.userType
+      role: role || currentUser.role
     });
     
     setIsLoading(false);
-  }, [navigate, userType]);
+  }, [navigate, role]);
 
   if (isLoading) {
     return <Loading />;
@@ -35,7 +35,7 @@ const Dashboard = ({ userType }) => {
 
   // Render dashboard content based on user type
   const renderDashboardContent = () => {
-    const type = user?.userType || userType;
+    const type = user?.role || role;
     
     switch(type) {
       case 'student':

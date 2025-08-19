@@ -49,7 +49,7 @@ const AuthenticatedNavbar = ({ user }) => {
         { path: '/rewards', label: 'Thành tích', icon: <FaTrophy /> },
       ]
     };
-    return baseItems[user?.userType] || baseItems.student;
+    return baseItems[user?.role] || baseItems.student;
   };
 
   const menuItems = getMenuItems();
@@ -62,7 +62,7 @@ const AuthenticatedNavbar = ({ user }) => {
   };
 
   const getUserDisplay = () => {
-    switch(user?.userType) {
+    switch(user?.role) {
       case 'student':
         return { icon: '🎒', label: 'Học sinh' };
       case 'teacher':
@@ -129,7 +129,7 @@ const AuthenticatedNavbar = ({ user }) => {
           {/* Right - User Info & Actions */}
           <div className="flex items-center gap-4">
             {/* Stars display for students */}
-            {user?.userType === 'student' && (
+            {user?.role === 'student' && (
               <motion.div 
                 className="hidden sm:flex items-center gap-2 px-4 py-2 bg-yellow-500/20 rounded-full"
                 whileHover={{ scale: 1.05 }}

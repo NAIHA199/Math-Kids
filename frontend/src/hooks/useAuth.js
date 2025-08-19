@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = useCallback(async ({ username, password, userType }) => {
+  const login = useCallback(async ({ username, password, role }) => {
     setIsLoading(true);
     try {
       // Simulate API call
@@ -12,11 +12,12 @@ export const useAuth = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           username,
           password,
-          userType,
+          role,
         }),
       });
       const data = await res.json();
@@ -37,7 +38,7 @@ export const useAuth = () => {
     }
   }, []);
 
-  const register = useCallback(async ({ userType, fullName, email, username, password }) => {
+  const register = useCallback(async ({ fullName, email, username, password, role }) => {
     setIsLoading(true);
     try {
       // Simulate API call
@@ -46,13 +47,14 @@ export const useAuth = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           fullName,
           email,
           username,
           password,
-          userType,
+          role,
         }),
       });
       const data = await res.json();
@@ -62,6 +64,7 @@ export const useAuth = () => {
       // Mock successful registration
       return { success: true };
     } catch (error) {
+      console.error('Registration error:', error);
       throw new Error('Registration failed');
     } finally {
       setIsLoading(false);

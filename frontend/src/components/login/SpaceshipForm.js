@@ -12,12 +12,12 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
     if (accountType?.id) {
       setFormData(prev => ({
         ...prev,
-        userType: accountType.id
+        role: accountType.id
       }));
     }
   }, [accountType]);
   const [formData, setFormData] = useState({ 
-    userType: '',
+    role: '',
     fullName: '',
     email: '',
     username: '', 

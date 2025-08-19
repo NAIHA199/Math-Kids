@@ -41,7 +41,7 @@ const MainLayout = ({ user }) => {
     ]
   };
 
-  const navItems = navigationItems[user?.userType] || navigationItems.student;
+  const navItems = navigationItems[user?.role] || navigationItems.student;
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">

@@ -42,7 +42,7 @@ const LoginPage = () => {
       setCurrentStep('launch');
       await login({
         ...data,
-        userType: selectedAccountType.id
+        role: selectedAccountType.id
       });
       
       // Success animation
