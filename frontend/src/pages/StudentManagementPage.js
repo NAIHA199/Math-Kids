@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
+
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -28,57 +30,58 @@ const StudentManagementPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-purple-300">Quản lý học sinh</h1>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-            + Thêm học sinh mới
-          </button>
-        </div>
-        <div className="bg-gray-800 shadow-xl rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Họ và Tên</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lớp</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tiến độ</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Hành động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-700">
-                {students.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-700/50 transition duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{student.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{student.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{student.class}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-full bg-gray-600 rounded-full h-2.5">
-                          <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${student.progress}%` }}></div>
-                        </div>
-                        <span className="ml-3 text-sm font-medium">{student.progress}%</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-4">
-                        <button className="text-blue-400 hover:text-blue-300 transition duration-300 flex items-center space-x-1">
-                          <EyeIcon /><span>Xem</span>
-                        </button>
-                        <button onClick={() => handleDelete(student.id)} className="text-red-500 hover:text-red-400 transition duration-300 flex items-center space-x-1">
-                          <TrashIcon /><span>Xóa</span>
-                        </button>
-                      </div>
-                    </td>
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Navbar sẽ được đặt ở trên cùng */}
+      <AuthenticatedNavbar user={{ role: 'teacher' }} />
+
+      <main className="pt-24 p-4 sm:p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+          </div>
+          <div className="bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="bg-gray-700">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Họ và Tên</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lớp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tiến độ</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Hành động</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {students.map((student) => (
+                    <tr key={student.id} className="hover:bg-gray-700/50 transition duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{student.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{student.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{student.class}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-full bg-gray-600 rounded-full h-2.5">
+                            <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${student.progress}%` }}></div>
+                          </div>
+                          <span className="ml-3 text-sm font-medium">{student.progress}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-4">
+                          <button className="text-blue-400 hover:text-blue-300 transition duration-300 flex items-center space-x-1">
+                            <EyeIcon /><span>Xem</span>
+                          </button>
+                          <button onClick={() => handleDelete(student.id)} className="text-red-500 hover:text-red-400 transition duration-300 flex items-center space-x-1">
+                            <TrashIcon /><span>Xóa</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

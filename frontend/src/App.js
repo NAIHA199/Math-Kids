@@ -18,6 +18,7 @@ import ClassManagementPage from './pages/ClassManagementPage';
 import AssignmentManagementPage from './pages/AssignmentManagementPage';
 // Import utils
 import { getCurrentUser } from './utils/helpers';
+import ReportPage from './pages/ReportPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -118,9 +119,7 @@ function App() {
           
           <Route path="/reports" element={
             <ProtectedRoute>
-              <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <h1 className="text-3xl">Báo cáo (Đang phát triển)</h1>
-              </div>
+              <ReportPage />
             </ProtectedRoute>
           } />
           

@@ -89,7 +89,7 @@ const GamePage = () => {
 
     return (
         <div className="min-h-screen bg-gray-900">
-            <AuthenticatedNavbar user={user} />
+            <AuthenticatedNavbar user={{ role: 'student' }} />
             <div className="pt-20 flex justify-center items-center min-h-screen p-4">
                 {ActiveGame ? (
                     <ActiveGame onBack={handleBackToMenu} />

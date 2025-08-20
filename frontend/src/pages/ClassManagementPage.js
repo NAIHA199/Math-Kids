@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 
 const UsersIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -27,12 +28,9 @@ const ClassManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8">
+      <AuthenticatedNavbar user={{ role: 'teacher' }} />
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-purple-300 mb-4 sm:mb-0">Quản lý lớp học</h1>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 w-full sm:w-auto">
-            + Tạo lớp học mới
-          </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {classes.map((cls) => (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 
 // --- Icons ---
 const EditIcon = () => (
@@ -48,12 +49,9 @@ const AssignmentManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8">
+        <AuthenticatedNavbar user={{ role: 'teacher' }} />
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-purple-300">Quản lý bài tập</h1>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-            + Giao bài tập mới
-          </button>
         </div>
         <div className="bg-gray-800 shadow-xl rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
