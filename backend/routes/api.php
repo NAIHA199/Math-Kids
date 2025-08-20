@@ -12,7 +12,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
 
-// Phân quyền theo role
+/*// Phân quyền theo role
 Route::group(['prefix' => 'student', 'middleware' => ['auth:sanctum', 'role:student']], function () {
     Route::get('/home', [UsersController::class, 'studentHome']);
 });
@@ -24,3 +24,4 @@ Route::group(['prefix' => 'teacher', 'middleware' => ['auth:sanctum', 'role:teac
 Route::group(['prefix' => 'parent', 'middleware' => ['auth:sanctum', 'role:parent']], function () {
     Route::get('/home', [UsersController::class, 'parentHome']);
 });
+*/

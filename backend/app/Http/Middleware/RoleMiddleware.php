@@ -24,10 +24,13 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Kiểm tra xem role của user có nằm trong danh sách các role được phép không
-        if ($user->role !== $role) {
-            return response()->json(['message' => 'Forbidden - You do not have permission to access this resource.'], 403);
+        // Check if the user's role is in the list of allowed roles
+        foreach ($roles as $role) {
+            if ($user->role === $role) {
+                return $next($request);
+            }
         }
-        return $next($request);
+
+        return response()->json(['message' => 'Forbidden - You do not have permission to access this resource.'], 403);
     }
 }

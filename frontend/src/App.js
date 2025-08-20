@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -12,7 +13,9 @@ import LessonPage from './pages/LessonPage';
 import GamePage from './pages/GamePage';
 import RewardPage from './pages/RewardPage';
 import ExercisePage from './pages/ExercisePage';
-
+import StudentManagementPage from './pages/StudentManagementPage';
+import ClassManagementPage from './pages/ClassManagementPage';
+import AssignmentManagementPage from './pages/AssignmentManagementPage';
 // Import utils
 import { getCurrentUser } from './utils/helpers';
 
@@ -86,13 +89,7 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/progress" element={
-            <ProtectedRoute>
-              <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <h1 className="text-3xl">Trang Tiến độ (Đang phát triển)</h1>
-              </div>
-            </ProtectedRoute>
-          } />
+
           
           <Route path="/exercises" element={
             <ProtectedRoute>
@@ -103,25 +100,19 @@ function App() {
           {/* Teacher specific routes */}
           <Route path="/classes" element={
             <ProtectedRoute>
-              <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <h1 className="text-3xl">Quản lý lớp học (Đang phát triển)</h1>
-              </div>
+              <ClassManagementPage />
             </ProtectedRoute>
           } />
           
           <Route path="/assignments" element={
             <ProtectedRoute>
-              <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <h1 className="text-3xl">Quản lý bài tập (Đang phát triển)</h1>
-              </div>
+              <AssignmentManagementPage />
             </ProtectedRoute>
           } />
           
           <Route path="/students" element={
             <ProtectedRoute>
-              <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <h1 className="text-3xl">Quản lý học sinh (Đang phát triển)</h1>
-              </div>
+              <StudentManagementPage />
             </ProtectedRoute>
           } />
           
