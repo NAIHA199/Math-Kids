@@ -16,7 +16,8 @@ import ExercisePage from './pages/ExercisePage';
 import StudentManagementPage from './pages/StudentManagementPage';
 import ClassManagementPage from './pages/ClassManagementPage';
 import AssignmentManagementPage from './pages/AssignmentManagementPage';
-// Import utils
+import Children from './pages/ChildrenManagementPage';
+
 import { getCurrentUser } from './utils/helpers';
 import ReportPage from './pages/ReportPage';
 
@@ -126,9 +127,7 @@ function App() {
           {/* Parent specific routes */}
           <Route path="/children" element={
             <ProtectedRoute>
-              <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <h1 className="text-3xl">Quản lý con em (Đang phát triển)</h1>
-              </div>
+              <Children />
             </ProtectedRoute>
           } />
           

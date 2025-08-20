@@ -1,343 +1,296 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle
-} from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { mockLessons } from '../utils/mockData';
+import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
+
+// =================================================================================
+// CÁC COMPONENT MOCK & ICON (Để khắc phục lỗi import)
+// =================================================================================
+
+
+// Các icon SVG thay thế cho react-icons để loại bỏ dependency
+const FaArrowLeft = () => <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"></path></svg>;
+const FaArrowRight = () => <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path></svg>;
+const FaSpinner = () => <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 66.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>;
+
+
+// =================================================================================
+// CÁC COMPONENT CON CHO TỪNG LOẠI NỘI DUNG BÀI HỌC
+// =================================================================================
+
+const VideoSection = ({ sectionData }) => (
+    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg animate-fade-in">
+        <h3 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">{sectionData.title}</h3>
+        <div className="relative aspect-video bg-black rounded-lg overflow-hidden shadow-inner">
+            <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={sectionData.videoUrl}
+                title={sectionData.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+            />
+        </div>
+        {sectionData.duration && (
+            <p className="text-sm text-gray-500 mt-3 text-right">Thời lượng: {sectionData.duration}</p>
+        )}
+    </div>
+);
+
+const ContentSection = ({ sectionData }) => (
+    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg animate-fade-in">
+        <h3 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">{sectionData.title}</h3>
+        {sectionData.image && (
+            <img
+                src={sectionData.image}
+                alt={sectionData.title}
+                className="float-right w-1/3 ml-4 mb-2 rounded-lg shadow-md hidden sm:block"
+            />
+        )}
+        <div
+            className="prose prose-lg max-w-none text-gray-700"
+            dangerouslySetInnerHTML={{ __html: sectionData.content }}
+        />
+    </div>
+);
+
+const QuizSection = ({ sectionData, onQuizComplete }) => {
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [score, setScore] = useState(0);
+    const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const [isAnswered, setIsAnswered] = useState(false);
+
+    const question = sectionData.questions[currentQuestionIndex];
+
+    const handleAnswerClick = (optionIndex) => {
+        if (isAnswered) return;
+
+        setSelectedAnswer(optionIndex);
+        setIsAnswered(true);
+
+        const isCorrectAnswer = optionIndex === question.correct;
+        if (isCorrectAnswer) {
+            setScore(score + 1);
+            toast.success('Chính xác!');
+        } else {
+            toast.error('Chưa đúng rồi!');
+        }
+
+        setTimeout(() => {
+            if (currentQuestionIndex < sectionData.questions.length - 1) {
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+                setIsAnswered(false);
+                setSelectedAnswer(null);
+            } else {
+                onQuizComplete(score + (isCorrectAnswer ? 1 : 0), sectionData.questions.length);
+            }
+        }, 1500);
+    };
+
+    return (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg animate-fade-in">
+            <h3 className="text-xl sm:text-2xl font-bold mb-2 text-gray-800">{sectionData.title}</h3>
+            <p className="text-sm text-gray-500 mb-4">
+                Câu {currentQuestionIndex + 1} / {sectionData.questions.length}
+            </p>
+            <p className="text-lg font-semibold text-gray-700 mb-6">{question.q}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {question.options.map((option, index) => {
+                    const isCorrect = index === question.correct;
+                    const isSelected = index === selectedAnswer;
+                    let buttonClass = 'bg-gray-100 hover:bg-indigo-100 text-gray-800';
+                    if (isAnswered && isSelected) {
+                        buttonClass = isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white';
+                    } else if (isAnswered && isCorrect) {
+                        buttonClass = 'bg-green-500 text-white';
+                    }
+
+                    return (
+                        <motion.button
+                            key={index}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleAnswerClick(index)}
+                            disabled={isAnswered}
+                            className={`p-4 rounded-lg font-medium text-left transition-colors duration-300 ${buttonClass}`}
+                        >
+                            {option}
+                        </motion.button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+
+// =================================================================================
+// COMPONENT CHÍNH CỦA TRANG BÀI HỌC
+// =================================================================================
 
 const LessonPage = () => {
-  const { grade } = useParams();
-  const navigate = useNavigate();
-  
-  // States
-  const [lessons, setLessons] = useState([]);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-  const [currentSection, setCurrentSection] = useState(0);
-  const [completedSections, setCompletedSections] = useState([]);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+    const { lessonId } = useParams();
+    const navigate = useNavigate();
 
-  // Load lessons khi component mount
-  useEffect(() => {
-    // Giả lập load từ API
-    const gradeLessons = mockLessons[grade] || [];
-    setLessons(gradeLessons);
-    if (gradeLessons.length > 0) {
-      setSelectedLesson(gradeLessons[0]);
-    }
-  }, [grade]);
+    const [lessonData, setLessonData] = useState(null);
+    const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+    const [completedSections, setCompletedSections] = useState(new Set());
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // Dữ liệu mẫu cho các section của bài học
-  const lessonSections = [
-    {
-      id: 1,
-      type: 'video',
-      title: 'Video giới thiệu',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Thay bằng video thật
-      duration: '5:30'
-    },
-    {
-      id: 2,
-      type: 'content',
-      title: 'Lý thuyết',
-      content: `
-        <h3>Phép cộng là gì?</h3>
-        <p>Phép cộng là cách chúng ta gộp các số lại với nhau để có tổng lớn hơn.</p>
-        <div class="example">
-          <p><strong>Ví dụ:</strong> 2 + 3 = 5</p>
-          <p>Có nghĩa là: 2 quả táo + 3 quả táo = 5 quả táo</p>
-        </div>
-      `,
-      image: 'https://via.placeholder.com/400x200/3b82f6/ffffff?text=2+%2B+3+=+5'
-    },
-    {
-      id: 3,
-      type: 'interactive',
-      title: 'Thực hành tương tác',
-      question: 'Kéo số đúng vào ô trống: 4 + __ = 7',
-      answer: 3,
-      options: [1, 2, 3, 4, 5]
-    },
-    {
-      id: 4,
-      type: 'quiz',
-      title: 'Kiểm tra nhanh',
-      questions: [
-        { q: '2 + 2 = ?', options: [3, 4, 5, 6], correct: 1 },
-        { q: '5 + 3 = ?', options: [6, 7, 8, 9], correct: 2 },
-        { q: '1 + 6 = ?', options: [5, 6, 7, 8], correct: 2 }
-      ]
-    }
-  ];
+    useEffect(() => {
+        const fetchLessonData = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const mockApiData = {
+                    id: lessonId,
+                    title: `Bài học về Phép Cộng (Lớp 1)`,
+                    grade: 1,
+                    sections: [
+                        { id: 'sec1', type: 'video', title: 'Video: Giới thiệu Phép Cộng', videoUrl: 'https://www.youtube.com/embed/Phbp2Y_P2CE?si=L-a_lqYw2n_yZz0o', duration: '5:30' },
+                        { id: 'sec2', type: 'content', title: 'Lý thuyết cơ bản', content: '<h3>Phép cộng là gì?</h3><p>Phép cộng là một trong bốn phép tính cơ bản, dùng để gộp các nhóm đối tượng lại với nhau. Ví dụ: 2 quả táo cộng 3 quả táo bằng 5 quả táo.</p>', image: 'https://placehold.co/400x200/3b82f6/ffffff?text=2+3=5' },
+                        { id: 'sec3', type: 'quiz', title: 'Kiểm tra nhanh', questions: [
+                            { q: '2 + 2 = ?', options: ['3', '4', '5', '6'], correct: 1 },
+                            { q: '5 + 3 = ?', options: ['6', '7', '8', '9'], correct: 2 },
+                        ]},
+                        { id: 'sec4', type: 'content', title: 'Tổng kết', content: '<h3>Chúc mừng!</h3><p>Bạn đã nắm được những kiến thức cơ bản về phép cộng. Hãy tiếp tục làm bài tập để thành thạo hơn nhé!</p>' }
+                    ]
+                };
 
-  // Xử lý chuyển section
-  const handleNextSection = () => {
-    if (currentSection < lessonSections.length - 1) {
-      // Đánh dấu section hiện tại là hoàn thành
-      if (!completedSections.includes(currentSection)) {
-        setCompletedSections([...completedSections, currentSection]);
-      }
-      setCurrentSection(currentSection + 1);
-    } else {
-      // Hoàn thành bài học
-      toast.success('Chúc mừng! Bạn đã hoàn thành bài học! 🎉');
-      navigate(`/exercise/${selectedLesson?.id}`);
-    }
-  };
-
-  const handlePrevSection = () => {
-    if (currentSection > 0) {
-      setCurrentSection(currentSection - 1);
-    }
-  };
-
-  // Component hiển thị Video
-  const VideoSection = ({ section }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-lg">
-      <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
-      <div className="relative bg-black rounded-lg overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-        <iframe
-          className="absolute top-0 left-0 w-full h-full"
-          src={section.videoUrl}
-          title={section.title}
-          frameBorder="0"
-          allowFullScreen
-        />
-      </div>
-      <p className="text-sm text-gray-600 mt-4">Thời lượng: {section.duration}</p>
-    </div>
-  );
-
-  // Component hiển thị Content
-  const ContentSection = ({ section }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-lg">
-      <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
-      <div 
-        className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: section.content }}
-      />
-      {section.image && (
-        <img 
-          src={section.image} 
-          alt="Minh họa" 
-          className="mt-6 rounded-lg shadow-md mx-auto"
-        />
-      )}
-    </div>
-  );
-
-  // Component Interactive (Drag & Drop đơn giản)
-  const InteractiveSection = ({ section }) => {
-    const [selectedAnswer, setSelectedAnswer] = useState(null);
-    const [isCorrect, setIsCorrect] = useState(null);
-
-    const handleSelectAnswer = (value) => {
-      setSelectedAnswer(value);
-      const correct = value === section.answer;
-      setIsCorrect(correct);
-      
-      if (correct) {
-        toast.success('Đúng rồi! 🎉');
-      } else {
-        toast.error('Thử lại nhé! 💪');
-      }
-    };
-
-    return (
-      <div className="bg-white rounded-2xl p-6 shadow-lg">
-        <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
-        <p className="text-xl mb-6">{section.question}</p>
-        
-        <div className="flex justify-center gap-4 flex-wrap">
-          {section.options.map((option) => (
-            <motion.button
-              key={option}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelectAnswer(option)}
-              className={`
-                w-16 h-16 rounded-lg font-bold text-xl
-                ${selectedAnswer === option
-                  ? isCorrect
-                    ? 'bg-green-500 text-white'
-                    : 'bg-red-500 text-white'
-                  : 'bg-blue-100 hover:bg-blue-200 text-blue-700'
+                if (!mockApiData) {
+                    throw new Error('Không tìm thấy bài học.');
                 }
-              `}
-            >
-              {option}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-    );
-  };
+                setLessonData(mockApiData);
+            } catch (err) {
+                setError(err.message);
+                toast.error(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchLessonData();
+    }, [lessonId]);
 
-  // Component Quiz
-  const QuizSection = ({ section }) => {
-    const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [score, setScore] = useState(0);
-    const [showResult, setShowResult] = useState(false);
-
-    const handleAnswer = (answerIndex) => {
-      if (answerIndex === section.questions[currentQuestion].correct) {
-        setScore(score + 1);
-        toast.success('Đúng rồi!');
-      } else {
-        toast.error('Sai rồi!');
-      }
-
-      if (currentQuestion < section.questions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
-      } else {
-        setShowResult(true);
-      }
+    const handleQuizComplete = (score, total) => {
+        toast.info(`Bạn đã trả lời đúng ${score}/${total} câu!`);
+        setTimeout(handleNextSection, 1000);
     };
 
-    if (showResult) {
-      return (
-        <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-          <h3 className="text-2xl font-bold mb-4">Kết quả</h3>
-          <p className="text-4xl font-bold text-purple-600 mb-4">
-            {score}/{section.questions.length}
-          </p>
-          <p className="text-gray-600">
-            {score === section.questions.length 
-              ? 'Xuất sắc! 🌟' 
-              : score >= section.questions.length/2 
-              ? 'Tốt lắm! 👍' 
-              : 'Cố gắng lên! 💪'}
-          </p>
-        </div>
-      );
-    }
-
-    const question = section.questions[currentQuestion];
-    
-    return (
-      <div className="bg-white rounded-2xl p-6 shadow-lg">
-        <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Câu {currentQuestion + 1}/{section.questions.length}
-        </p>
-        <p className="text-xl mb-6">{question.q}</p>
+    const renderCurrentSection = () => {
+        if (!lessonData) return null;
+        const section = lessonData.sections[currentSectionIndex];
         
-        <div className="grid grid-cols-2 gap-4">
-          {question.options.map((option, index) => (
-            <motion.button
-              key={index}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleAnswer(index)}
-              className="p-4 bg-purple-100 hover:bg-purple-200 rounded-lg font-medium"
-            >
-              {option}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-    );
-  };
+        switch (section.type) {
+            case 'video': return <VideoSection sectionData={section} />;
+            case 'content': return <ContentSection sectionData={section} />;
+            case 'quiz': return <QuizSection sectionData={section} onQuizComplete={handleQuizComplete} />;
+            default: return <div className="bg-white rounded-2xl p-6 shadow-lg">Nội dung không xác định.</div>;
+        }
+    };
 
-  // Render section hiện tại
-  const renderSection = () => {
-    const section = lessonSections[currentSection];
-    
-    switch (section.type) {
-      case 'video':
-        return <VideoSection section={section} />;
-      case 'content':
-        return <ContentSection section={section} />;
-      case 'interactive':
-        return <InteractiveSection section={section} />;
-      case 'quiz':
-        return <QuizSection section={section} />;
-      default:
-        return null;
-    }
-  };
+    const handleNextSection = () => {
+        const newCompleted = new Set(completedSections).add(currentSectionIndex);
+        setCompletedSections(newCompleted);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center text-gray-600 hover:text-gray-800"
-            >
-              <FaArrowLeft className="mr-2" />
-              Quay lại
-            </button>
-            
-            <h1 className="text-2xl font-bold">
-              {selectedLesson?.title || 'Bài học'}
-            </h1>
-            
-            <div className="text-sm text-gray-600">
-              Lớp {grade}
+        if (currentSectionIndex < lessonData.sections.length - 1) {
+            setCurrentSectionIndex(currentSectionIndex + 1);
+        } else {
+            toast.success('Chúc mừng! Bạn đã hoàn thành bài học! 🎉');
+            navigate(`/dashboard`); 
+        }
+    };
+
+    const handlePrevSection = () => {
+        if (currentSectionIndex > 0) {
+            setCurrentSectionIndex(currentSectionIndex - 1);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+                <FaSpinner className="animate-spin text-purple-600 text-4xl" />
             </div>
-          </div>
+        );
+    }
 
-          {/* Progress bar */}
-          <div className="flex items-center gap-2">
-            {lessonSections.map((_, index) => (
-              <div
-                key={index}
-                className={`flex-1 h-2 rounded-full transition-all ${
-                  index < currentSection
-                    ? 'bg-green-500'
-                    : index === currentSection
-                    ? 'bg-purple-500'
-                    : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center text-center p-4">
+                <h2 className="text-2xl font-bold text-red-600 mb-4">Đã xảy ra lỗi</h2>
+                <p className="text-gray-700 mb-6">{error}</p>
+                <button onClick={() => navigate(-1)} className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700">
+                    Quay lại
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <AuthenticatedNavbar user={{ role: 'student' }} />
+            <div className="container mx-auto max-w-4xl px-4 py-8 pt-24">
+                <div className="mb-6">
+                    <button onClick={() => navigate(-1)} className="flex items-center text-sm text-gray-600 hover:text-purple-700 font-medium mb-2">
+                        <FaArrowLeft className="mr-2" />
+                        Quay lại danh sách
+                    </button>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">
+                        {lessonData?.title}
+                    </h1>
+                </div>
+
+                <div className="flex items-center gap-2 mb-8">
+                    {lessonData?.sections.map((_, index) => (
+                        <div
+                            key={index}
+                            className={`flex-1 h-2 rounded-full transition-colors duration-500 ${
+                                completedSections.has(index) || index < currentSectionIndex
+                                    ? 'bg-green-500'
+                                    : index === currentSectionIndex
+                                    ? 'bg-purple-500'
+                                    : 'bg-gray-300'
+                            }`}
+                        />
+                    ))}
+                </div>
+
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentSectionIndex}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {renderCurrentSection()}
+                    </motion.div>
+                </AnimatePresence>
+
+                <div className="flex justify-between mt-8">
+                    <button
+                        onClick={handlePrevSection}
+                        disabled={currentSectionIndex === 0}
+                        className="flex items-center px-5 py-3 rounded-lg font-semibold text-gray-700 bg-white shadow-md hover:bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all"
+                    >
+                        <FaArrowLeft className="mr-2" />
+                        Trước
+                    </button>
+                    <button
+                        onClick={handleNextSection}
+                        className="flex items-center px-5 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 shadow-lg shadow-purple-500/30 transition-all"
+                    >
+                        {currentSectionIndex === lessonData?.sections.length - 1 ? 'Hoàn thành' : 'Tiếp theo'}
+                        <FaArrowRight className="ml-2" />
+                    </button>
+                </div>
+            </div>
         </div>
-
-        {/* Main content */}
-        <motion.div
-          key={currentSection}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {renderSection()}
-        </motion.div>
-
-        {/* Navigation buttons */}
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={handlePrevSection}
-            disabled={currentSection === 0}
-            className={`
-              flex items-center px-6 py-3 rounded-lg font-medium
-              ${currentSection === 0
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 hover:bg-gray-100 shadow-lg'
-              }
-            `}
-          >
-            <FaArrowLeft className="mr-2" />
-            Trước
-          </button>
-
-          <button
-            onClick={handleNextSection}
-            className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 shadow-lg"
-          >
-            {currentSection === lessonSections.length - 1 ? 'Hoàn thành' : 'Tiếp theo'}
-            <FaArrowRight className="ml-2" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default LessonPage;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Question from '../components/exercise/Question';
 import questions from '../utils/Question.json';
-
+import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 const ExercisePage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -39,6 +39,7 @@ const ExercisePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 py-12 px-4">
+      <AuthenticatedNavbar user={{ role: 'student' }} />
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Math Exercise</h1>
