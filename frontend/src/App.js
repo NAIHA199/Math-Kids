@@ -22,11 +22,27 @@ import { getCurrentUser } from './utils/helpers';
 import ReportPage from './pages/ReportPage';
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = getCurrentUser();
   if (!user) {
     return <Navigate to="/login" replace />;
   }
+  
+  // If allowedRoles is specified, check if user's role is included
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // Redirect to their own dashboard
+    switch(user.role) {
+      case 'student':
+        return <Navigate to="/student-home" replace />;
+      case 'teacher':
+        return <Navigate to="/teacher-home" replace />;
+      case 'parent':
+        return <Navigate to="/parent-home" replace />;
+      default:
+        return <Navigate to="/home" replace />;
+    }
+  }
+  
   return children;
 };
 
@@ -34,7 +50,17 @@ const ProtectedRoute = ({ children }) => {
 const PublicRoute = ({ children }) => {
   const user = getCurrentUser();
   if (user) {
-    return <Navigate to="/home" replace />;
+    // Redirect to role-specific dashboard
+    switch(user.role) {
+      case 'student':
+        return <Navigate to="/student-home" replace />;
+      case 'teacher':
+        return <Navigate to="/teacher-home" replace />;
+      case 'parent':
+        return <Navigate to="/parent-home" replace />;
+      default:
+        return <Navigate to="/home" replace />;
+    }
   }
   return children;
 };
@@ -59,74 +85,106 @@ function App() {
             </PublicRoute>
           } />
           
-          {/* Protected routes - Main authenticated home */}
-          <Route path="/home" element={
-            <ProtectedRoute>
+          {/* Protected routes - Role-specific homes */}
+          <Route path="/student-home" element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <AuthenticatedHomePage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/teacher-home" element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <AuthenticatedHomePage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/parent-home" element={
+            <ProtectedRoute allowedRoles={['parent']}>
               <AuthenticatedHomePage />
             </ProtectedRoute>
           } />
           
           {/* Legacy dashboard redirects */}
           <Route path="/dashboard" element={<Navigate to="/home" replace />} />
-          <Route path="/student-dashboard" element={<Navigate to="/home" replace />} />
-          <Route path="/teacher-dashboard" element={<Navigate to="/home" replace />} />
-          <Route path="/parent-dashboard" element={<Navigate to="/home" replace />} />
+          <Route path="/student-dashboard" element={<Navigate to="/student-home" replace />} />
+          <Route path="/teacher-dashboard" element={<Navigate to="/teacher-home" replace />} />
+          <Route path="/parent-dashboard" element={<Navigate to="/parent-home" replace />} />
+          
+          {/* Fallback for old /home route - redirect to role-specific home */}
+          <Route path="/home" element={
+            <ProtectedRoute>
+              {(() => {
+                const user = getCurrentUser();
+                if (user) {
+                  switch(user.role) {
+                    case 'student':
+                      return <Navigate to="/student-home" replace />;
+                    case 'teacher':
+                      return <Navigate to="/teacher-home" replace />;
+                    case 'parent':
+                      return <Navigate to="/parent-home" replace />;
+                    default:
+                      return <Navigate to="/student-home" replace />;
+                  }
+                }
+                return <Navigate to="/login" replace />;
+              })()}
+            </ProtectedRoute>
+          } />
           
           {/* Student features */}
           <Route path="/lessons" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['student']}>
               <LessonPage />
             </ProtectedRoute>
           } />
           
           <Route path="/games" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['student']}>
               <GamePage />
             </ProtectedRoute>
           } />
           
           <Route path="/rewards" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['student']}>
               <RewardPage />
             </ProtectedRoute>
           } />
           
-
-          
           <Route path="/exercises" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['student']}>
               <ExercisePage />
             </ProtectedRoute>
           } />
           
           {/* Teacher specific routes */}
           <Route path="/classes" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['teacher']}>
               <ClassManagementPage />
             </ProtectedRoute>
           } />
           
           <Route path="/assignments" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['teacher']}>
               <AssignmentManagementPage />
             </ProtectedRoute>
           } />
           
           <Route path="/students" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['teacher']}>
               <StudentManagementPage />
             </ProtectedRoute>
           } />
           
           <Route path="/reports" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['teacher', 'parent']}>
               <ReportPage />
             </ProtectedRoute>
           } />
           
           {/* Parent specific routes */}
           <Route path="/children" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['parent']}>
               <Children />
             </ProtectedRoute>
           } />

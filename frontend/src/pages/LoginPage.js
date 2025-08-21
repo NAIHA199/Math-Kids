@@ -47,7 +47,20 @@ const LoginPage = () => {
       
       // Success animation
       setTimeout(() => {
-        navigate('/home'); 
+        // Navigate to role-specific dashboard
+        switch(selectedAccountType.id) {
+          case 'student':
+            navigate('/student-home');
+            break;
+          case 'teacher':
+            navigate('/teacher-home');
+            break;
+          case 'parent':
+            navigate('/parent-home');
+            break;
+          default:
+            navigate('/home');
+        }
       }, 1500);
     } catch (error) {
       setCurrentStep('loginForm');
