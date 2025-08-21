@@ -117,9 +117,30 @@ const GamePage = () => {
     const ActiveGame = GAMES.find(g => g.id === activeGameId)?.component;
 
     return (
-        <div className="min-h-screen w-full bg-slate-900 text-white overflow-hidden relative">
-            {/* Hiệu ứng nền */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+        <div className="min-h-screen w-full bg-black text-white overflow-hidden relative">
+            {/* Simplified Space Background */}
+            <div className="fixed inset-0 z-0">
+                {/* Static stars - No animation */}
+                <div className="absolute inset-0">
+                    {[...Array(50)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute bg-white rounded-full"
+                            style={{
+                                width: '2px',         // Đặt kích thước cố định
+                                height: '2px',        // Đặt kích thước cố định
+                                left: Math.random() * 100 + '%',
+                                top: Math.random() * 100 + '%',
+                                opacity: Math.random() * 0.8 + 0.2
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Simple gradient nebula - No animation */}
+                <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl" />
+            </div>
             
             <AuthenticatedNavbar user={user} />
             
