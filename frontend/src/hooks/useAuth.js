@@ -71,9 +71,30 @@ export const useAuth = () => {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+  const logout = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await fetch('http://127.0.0.1:8000/api/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      //xóa dữ liệu token và user trong local
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      //Điều hướng về trang ban đầu
+      window.location.href = "/";
+    }
+    
   }, []);
 
   return { login, register, logout, isLoading };

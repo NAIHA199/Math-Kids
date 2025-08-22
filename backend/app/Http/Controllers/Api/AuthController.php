@@ -30,30 +30,30 @@ class AuthController extends Controller
             'password' => Hash::make($request['password']),
         ]);
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        //$token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
             'message' => 'User registered successfully',
             'user' => $user,
-            'token' => $token,
-            'token_type' => 'Bearer',
+            //'token' => $token,
+            //'token_type' => 'Bearer',
         ], 201);
     }
 
     // Đăng nhập, kiểm tra thông tin trả về sanctum token cho front
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validated();
+        $user = User::where('username', $request->username)->first();
 
-        if (!Auth::attempt($credentials)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Tên đăng nhập hoặc mật khẩu không đúng'], 401);
         }
-        /*//Đổi userType -> role
-        if($request->has('userType')) {
-            $request->merge(['role' => $request->userType]);
-        }*/
+
+        if ($user->role !== $request->role) {
+            return response()->json(['message' => 'Bạn không có quyền truy cập'], 403);
+        }
+
         //Tạo token
-        $user = Auth::user();
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
@@ -68,6 +68,7 @@ class AuthController extends Controller
                 'email' => $user->email
             ]
         ]);
+
     }
 
     // Lấy thông tin user đang đăng nhập từ token

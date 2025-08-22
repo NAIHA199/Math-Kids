@@ -18,13 +18,14 @@ import {
   FaClipboardList
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../hooks/useAuth';
 
 const AuthenticatedNavbar = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-
+  const { logout } = useAuth();
   // Menu items based on user type
   const getMenuItems = () => {
     const baseItems = {
@@ -54,12 +55,7 @@ const AuthenticatedNavbar = ({ user }) => {
 
   const menuItems = getMenuItems();
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    toast.success('Đăng xuất thành công!');
-    navigate('/');
-  };
+  
 
   const getUserDisplay = () => {
     switch(user?.role) {
@@ -190,7 +186,7 @@ const AuthenticatedNavbar = ({ user }) => {
                     <hr className="border-gray-700" />
                     
                     <button
-                      onClick={handleLogout}
+                      onClick={logout}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors text-red-400"
                     >
                       <FaSignOutAlt />

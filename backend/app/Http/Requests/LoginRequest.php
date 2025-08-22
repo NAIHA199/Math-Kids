@@ -25,6 +25,7 @@ class LoginRequest extends FormRequest
         return [
             'username' => 'required|string', // đăng nhập bằng username
             'password' => 'required|string',
+            'role' => 'required|string|in:student,teacher,parent'
         ];
     }
 }

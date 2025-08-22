@@ -24,7 +24,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'role' => 'required|in:student,teacher,parent', // gán chức vụ khi đăng kí
-            'fullName' => 'nullable|string|max:255',
+            'fullName' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:6', // confirmed thêm trường kiểm tra pass và front-end phải gửi pass_confirm để rule đó hoạt động
