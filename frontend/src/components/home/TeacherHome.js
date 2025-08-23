@@ -11,9 +11,36 @@ import {
   FaCheckCircle,
   FaClock
 } from 'react-icons/fa';
+import { useEffect, useState} from 'react';
+
 
 const TeacherHome = ({ user }) => {
   const navigate = useNavigate();
+
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+    fetch("http://127.0.0.1:8000/api/teacher-home", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unauthorized or API error");
+        }
+        return response.json();
+      })
+      .then((json) => setData(json))
+      .catch((error) => {
+        console.error("API error:", error);
+        navigate("/login"); // nếu token sai thì đẩy về login
+      });
+  }, [navigate]);
+  
+  if(!data) return <p>Loading...</p>
 
   // Teacher stats
   const stats = {

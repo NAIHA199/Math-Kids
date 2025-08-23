@@ -30,7 +30,7 @@ const AuthenticatedHomePage = () => {
       case 'parent':
         return <ParentHome user={user} />;
       default:
-        return <StudentHome user={user} />;
+        return <p>Role không hợp lệ</p>;
     }
   };
 

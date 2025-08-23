@@ -46,13 +46,13 @@ class AuthController extends Controller
         $user = User::where('username', $request->username)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Tên đăng nhập hoặc mật khẩu không đúng'], 401);
+            return response()->json(['message' => 'Incorrect username or password'], 401);
         }
 
+        // chặn role sai từ lúc login
         if ($user->role !== $request->role) {
-            return response()->json(['message' => 'Bạn không có quyền truy cập'], 403);
-        }
-
+        return response()->json(['message' => 'You do not have permission'], 403);
+    }
         //Tạo token
         $token = $user->createToken('api-token')->plainTextToken;
 

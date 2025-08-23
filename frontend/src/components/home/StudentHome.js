@@ -13,10 +13,27 @@ import {
   FaClock,
   FaGift
 } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+
 
 const StudentHome = ({ user }) => {
   const navigate = useNavigate();
 
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch("http://127.0.0.1:8000/api/student-home", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .then(setData)
+      .catch(error => console.error('API error:', error));
+  }, []);
+
+  if(!data) return <p>Loading...</p>
   // Daily missions
   const dailyMissions = [
     { id: 1, title: 'Hoàn thành 3 bài học', progress: 1, total: 3, reward: 50 },

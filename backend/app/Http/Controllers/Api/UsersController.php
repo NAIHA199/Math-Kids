@@ -4,45 +4,41 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Http\Request;
 class UsersController extends Controller
 {
-    public function studentHome(): JsonResponse
+    public function studentHome(Request $request): JsonResponse
     {
+
         return response()->json([
             'message' => 'Welcome to student home',
             'data' => [
-                'role' => 'student',
-                'features' => [
-                    'lessons', 'games', 'rewards', 'progress'
-                ]
+                'role' => $request->user()->role,
+                'user' => $request->user()
             ]
         ]);
     }
 
-    public function teacherHome(): JsonResponse
+    public function teacherHome(Request $request): JsonResponse
     {
         return response()->json([
             'message' => 'Welcome to teacher home',
             'data' => [
-                'role' => 'teacher',
-                'features' => [
-                    'classes', 'assignments', 'students', 'reports'
-                ]
+                'role' => $request->user()->role,
+                'user' => $request->user()
             ]
         ]);
     }
 
-    public function parentHome(): JsonResponse
+    public function parentHome(Request $request): JsonResponse
     {
         return response()->json([
             'message' => 'Welcome to parent home',
             'data' => [
-                'role' => 'parent',
-                'features' => [
-                    'children', 'progress', 'reports', 'notifications'
-                ]
+                'role' => $request->user()->role,
+                'user' => $request->user()
             ]
         ]);
+
     }
 }
