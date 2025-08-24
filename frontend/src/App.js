@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -20,6 +19,8 @@ import Children from './pages/ChildrenManagementPage';
 
 import { getCurrentUser } from './utils/helpers';
 import ReportPage from './pages/ReportPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -82,6 +83,18 @@ function App() {
           <Route path="/register" element={
             <PublicRoute>
               <RegisterPage />
+            </PublicRoute>
+          } />
+          
+          <Route path="/forgot-password" element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          } />
+          
+          <Route path="/reset-password" element={
+            <PublicRoute>
+              <ResetPasswordPage />
             </PublicRoute>
           } />
           
