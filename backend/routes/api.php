@@ -4,9 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsersController;
+use App\Http\Controllers\Api\ForgotPasswordController;
 
-
-
+//Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -18,3 +18,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/teacher-home', [UsersController::class, 'teacherHome'])->middleware('role:teacher');
     Route::get('/parent-home', [UsersController::class, 'parentHome'])->middleware('role:parent');
 });
+
+//Route quên và reset mật khẩu
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
