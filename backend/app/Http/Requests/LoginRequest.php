@@ -20,7 +20,7 @@ class LoginRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(): array // Dựa vào các quy tắc trong hàm này để validate
     {
         return [
             'username' => 'required|string', // đăng nhập bằng username

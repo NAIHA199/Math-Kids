@@ -20,14 +20,14 @@ class RegisterRequest extends FormRequest
         }
     }*/
 
-    public function rules(): array // Nhận role từ front-end
+    public function rules(): array // Nhận role từ front-end, Dựa vào các role trong hàm này để validate
     {
         return [
             'role' => 'required|in:student,teacher,parent', // gán chức vụ khi đăng kí
             'fullName' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:6', // confirmed thêm trường kiểm tra pass và front-end phải gửi pass_confirm để rule đó hoạt động
+            'password' => 'required|string|min:6|confirmed', // confirmed thêm trường kiểm tra pass và front-end phải gửi pass_confirm để rule đó hoạt động
 
         ];
 

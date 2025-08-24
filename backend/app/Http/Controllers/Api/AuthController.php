@@ -23,11 +23,11 @@ class AuthController extends Controller
     {
 
         $user = User::create([
-            'role' => $request['role'],
-            'fullName' => $request['fullName'],
-            'email' => $request['email'],
-            'username' => $request['username'],
-            'password' => Hash::make($request['password']),
+            'role' => $request->get('role'),
+            'fullName' => $request->get('fullName'),
+            'email' => $request->get('email'),
+            'username' => $request->get('username'),
+            'password' => Hash::make($request->get('password')),
         ]);
 
         //$token = $user->createToken('api-token')->plainTextToken;
@@ -76,6 +76,7 @@ class AuthController extends Controller
     {
         return response()->json(Auth::user());
     }
+
     // Đăng xuất, xóa token
     public function logout(Request $request)
     {

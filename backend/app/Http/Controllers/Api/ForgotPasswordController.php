@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
+use App\Notifications\ResetPasswordNotification;
 
 class ForgotPasswordController extends Controller
 {
@@ -21,35 +23,18 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return response()->json(['message' => 'Email does not exist.'], 404);
+            return response()->json(['message' => 'Email does not exist or is invalid.'], 404);
         }
 
-        // tạo lại token (lấy random)
-        $token = Str::random(60);
+        // Tạo token
+        $token = Password::broker()->createToken($user);
 
-        //Lưu token vào DB
-        DB::table('password_resets')->insert([
-            'email' => $user->email,
-            'token' => Hash::make($token),
-            'created_at' => now()
-        ]);
-
-        // Gửi email reset mật khẩu
-        Mail::raw("Click here to reset your password: " .
-            url("http://localhost:3000/reset-password?token=$token&email=" . $request($user->email)),
-            function ($message) use ($user) {
-                $message->to($user->email);
-                $message->subject('Reset Password Notification');
-
-            }
-        );
+        //Gửi mail đổi mk
+        $user->notify(new ResetPasswordNotification($token));
 
 
-
-
-        return response()->json(['message' => 'Sent email reset password.']);
+        return response()->json(['message' => 'Sent reset password link']);
     }
-
     // Reset password
     public function resetPassword(Request $request)
     {
@@ -59,27 +44,18 @@ class ForgotPasswordController extends Controller
             'password' => 'required|confirmed|min:6'
         ]);
 
-        $email = $request->email;
-        $token = $request->token;
+        $status = Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->save();
+            }
+        );
 
-        $passwordReset = DB::table('password_resets')
-            ->where('email', $email)
-            ->where('token', $token)
-            ->first();
-
-        if (!$passwordReset || !Hash::check($token, $passwordReset->token)) {
-            return response()->json(['message' => 'Invalid token or email.'], 400);
-        }
-
-        //Cập nhật lại pass mới
-        $user = User::where('email', $email)->first();
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        //Xóa token reset
-        DB::table('password_resets')->where('email', $email)->delete();
-
-        return response()->json(['message' => 'Password has been reset successfully.']);
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => 'Password has been reset successfully.'])
+            : response()->json(['message' => 'Failed to reset password.'], 500);
     }
 
 }
