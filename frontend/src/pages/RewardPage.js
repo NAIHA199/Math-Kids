@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getCurrentUser } from '../utils/helpers';
+import SpaceBackground from '../components/ui/SpaceBackground';
 
 const RewardPage = () => {
   const navigate = useNavigate();
@@ -121,8 +122,34 @@ const RewardPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-black text-white">
+      {/* Space Background */}
+      <SpaceBackground />
+      
+      <div className="relative z-10">
+        {/* Navbar */}
+        <nav className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center">
+                <button 
+                  onClick={() => navigate(-1)}
+                  className="flex items-center text-gray-300 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Quay lại
+                </button>
+              </div>
+              <div className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Bảng vàng thành tích
+              </div>
+              <div className="w-20"></div> {/* Spacer for alignment */}
+            </div>
+          </div>
+        </nav>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

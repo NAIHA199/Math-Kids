@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Question from '../components/exercise/Question';
 import questions from '../utils/Question.json';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
+import SpaceBackground from '../components/ui/SpaceBackground';
+
 const ExercisePage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -29,69 +31,72 @@ const ExercisePage = () => {
   const handleSubmitAnswer = () => {
     setShowResults({
       ...showResults,
-      [currentQuestionIndex]: true
+      [currentQuestionIndex]: {
+        isCorrect: selectedOptions[currentQuestionIndex] === questions[currentQuestionIndex].correct,
+        correctAnswer: questions[currentQuestionIndex].correct
+      }
     });
   };
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const selectedOption = selectedOptions[currentQuestionIndex];
-  const showResult = showResults[currentQuestionIndex];
+  const handleRestart = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedOptions({});
+    setShowResults({});
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 py-12 px-4">
-      <AuthenticatedNavbar user={{ role: 'student' }} />
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Math Exercise</h1>
-          <p className="text-gray-600">Question {currentQuestionIndex + 1} of {questions.length}</p>
-        </div>
-
-        <div className="flex justify-center mb-8">
+    <div className="min-h-screen bg-black text-white">
+      {/* Space Background */}
+      <SpaceBackground />
+      
+      <AuthenticatedNavbar />
+      
+      <div className="relative z-10 pt-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold text-center mb-8">Bài tập Toán</h1>
+          
           <Question
-            questionData={currentQuestion}
-            onAnswerSelect={handleAnswerSelect}
-            selectedOption={selectedOption}
-            showResult={showResult}
+            question={questions[currentQuestionIndex]}
+            selectedOption={selectedOptions[currentQuestionIndex]}
+            showResult={showResults[currentQuestionIndex]}
+            onSelectOption={handleAnswerSelect}
           />
-        </div>
-
-        <div className="flex justify-between max-w-2xl mx-auto">
-          <button
-            onClick={handlePreviousQuestion}
-            disabled={currentQuestionIndex === 0}
-            className={`px-6 py-3 rounded-lg font-medium ${
-              currentQuestionIndex === 0
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-            }`}
-          >
-            Previous
-          </button>
-
-          {!showResult ? (
+          
+          <div className="flex justify-between mt-8">
             <button
-              onClick={handleSubmitAnswer}
-              disabled={selectedOption === undefined}
-              className={`px-6 py-3 rounded-lg font-medium ${
-                selectedOption === undefined
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-              }`}
+              onClick={handlePreviousQuestion}
+              disabled={currentQuestionIndex === 0}
+              className="px-6 py-2 bg-blue-600 rounded-lg disabled:opacity-50 hover:bg-blue-700 transition-colors"
             >
-              Check Answer
+              Câu trước
             </button>
-          ) : (
-            <button
-              onClick={handleNextQuestion}
-              disabled={currentQuestionIndex === questions.length - 1}
-              className={`px-6 py-3 rounded-lg font-medium ${
-                currentQuestionIndex === questions.length - 1
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-green-500 text-white hover:bg-green-600'
-              }`}
-            >
-              {currentQuestionIndex === questions.length - 1 ? 'Finish' : 'Next'}
-            </button>
+            
+            {currentQuestionIndex < questions.length - 1 ? (
+              <button
+                onClick={handleNextQuestion}
+                className="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Câu tiếp theo
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmitAnswer}
+                className="px-6 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Kết thúc
+              </button>
+            )}
+          </div>
+          
+          {Object.keys(showResults).length > 0 && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={handleRestart}
+                className="px-6 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Làm lại
+              </button>
+            </div>
           )}
         </div>
       </div>
