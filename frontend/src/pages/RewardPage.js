@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getCurrentUser } from '../utils/helpers';
+import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 
 const RewardPage = () => {
   const navigate = useNavigate();
@@ -122,6 +123,7 @@ const RewardPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 p-4">
+      <AuthenticatedNavbar user={user} />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
