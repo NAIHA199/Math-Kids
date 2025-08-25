@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getCurrentUser } from '../utils/helpers';
+import SpaceBackground from '../components/ui/SpaceBackground';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 
 const RewardPage = () => {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
+import SpaceBackground from '../components/ui/SpaceBackground';
 
 // --- Icons ---
 const EditIcon = () => (
@@ -48,48 +49,54 @@ const AssignmentManagementPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-6 md:p-8">
-        <AuthenticatedNavbar user={{ role: 'teacher' }} />
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-        </div>
-        <div className="bg-gray-800 shadow-xl rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tên bài tập</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lớp</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Ngày giao</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Hạn nộp</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Trạng thái</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Hành động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-700">
-                {assignments.map((assignment) => (
-                  <tr key={assignment.id} className="hover:bg-gray-700/50 transition duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{assignment.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{assignment.class}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{assignment.assignedDate}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{assignment.dueDate}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <StatusBadge status={assignment.status} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-4">
-                        <button className="text-blue-400 hover:text-blue-300 transition duration-300 flex items-center space-x-1">
-                          <EditIcon /><span>Sửa</span>
-                        </button>
-                        <button onClick={() => handleDelete(assignment.id)} className="text-red-500 hover:text-red-400 transition duration-300 flex items-center space-x-1">
-                          <TrashIcon /><span>Xóa</span>
-                        </button>
-                      </div>
-                    </td>
+    <div className="min-h-screen bg-black text-white">
+      {/* Space Background */}
+      <SpaceBackground />
+      
+      <AuthenticatedNavbar user={{ role: 'teacher' }} />
+      
+      <div className="relative z-10 pt-20 px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+          </div>
+          <div className="bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="bg-gray-700">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tên bài tập</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lớp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Ngày giao</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Hạn nộp</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Trạng thái</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Hành động</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {assignments.map((assignment) => (
+                    <tr key={assignment.id} className="hover:bg-gray-700/50 transition duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{assignment.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{assignment.class}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{assignment.assignedDate}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{assignment.dueDate}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <StatusBadge status={assignment.status} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-4">
+                          <button className="text-blue-400 hover:text-blue-300 transition duration-300 flex items-center space-x-1">
+                            <EditIcon /><span>Sửa</span>
+                          </button>
+                          <button onClick={() => handleDelete(assignment.id)} className="text-red-500 hover:text-red-400 transition duration-300 flex items-center space-x-1">
+                            <TrashIcon /><span>Xóa</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

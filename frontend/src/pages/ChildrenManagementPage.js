@@ -1,5 +1,6 @@
 import React from 'react';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
+import SpaceBackground from '../components/ui/SpaceBackground';
 
 // =================================================================================
 // CÁC COMPONENT ICON (SVG) ĐỂ TRÁNH LỖI IMPORT
@@ -80,9 +81,14 @@ const ChildCard = ({ child }) => (
 
 const Children = () => {
     return (
-        <div className="min-h-screen bg-slate-900 text-white p-4 sm:p-8">
+        <div className="min-h-screen bg-black text-white">
+            {/* Space Background */}
+            <SpaceBackground />
+            
             <AuthenticatedNavbar user={{ role: 'parent' }} />
-            <div className="max-w-7xl mx-auto">
+            
+            <div className="relative z-10 pt-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
 
                 {/* Phần tổng quan */}
                 <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -145,6 +151,7 @@ const Children = () => {
                             </div>
                         </section>
                     </aside>
+                </div>
                 </div>
             </div>
         </div>

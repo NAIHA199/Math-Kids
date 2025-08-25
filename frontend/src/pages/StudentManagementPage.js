@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
+import SpaceBackground from '../components/ui/SpaceBackground';
 
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -30,11 +30,13 @@ const StudentManagementPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Navbar sẽ được đặt ở trên cùng */}
+    <div className="min-h-screen bg-black text-white">
+      {/* Space Background */}
+      <SpaceBackground />
+      
       <AuthenticatedNavbar user={{ role: 'teacher' }} />
-
-      <main className="pt-24 p-4 sm:p-6 md:p-8">
+      
+      <div className="relative z-10 pt-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6">
           </div>
@@ -81,7 +83,7 @@ const StudentManagementPage = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
