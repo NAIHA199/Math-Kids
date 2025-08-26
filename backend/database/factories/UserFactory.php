@@ -30,6 +30,9 @@ class UserFactory extends Factory
             'username' => fake()->unique()->userName(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // thêm các field này cho đúng với bảng users
+            'role'  => fake()->randomElement(['student', 'teacher', 'parent']),
+            'grade_id' => fake()->numberBetween(1, 5), // giả sử có khối 1 → 5
         ];
     }
 

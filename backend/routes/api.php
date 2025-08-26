@@ -22,3 +22,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //Route quên và reset mật khẩu
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
+
+//Route bài học 
+Route::get('/lessons', [LessonController::class, 'index']);
+Route::get('/lessons/{id}', [LessonController::class, 'show']);
+Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);
+
+//Route bài tập 
+Route::get('/exercises', [ExerciseController::class, 'index']);
+Route::get('/exercises/{id}', [ExerciseController::class, 'show']);

@@ -14,12 +14,13 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable, HasFactory;
 
-    protected $fillable = [
+    protected $fillable = [ 
         'role',
         'fullName',
         'email',
         'username',
         'password',
+        'grade_id',// Thêm grade_id vào fillable
     ];
 
     /**
@@ -43,5 +44,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+        
+    }
+    // Quan hệ: 1 user thuộc về 1 grade (có thể null)
+    public function grade()
+    {
+        return $this->belongsTo(Grade::class);
     }
 }
