@@ -11,17 +11,17 @@ return new class extends Migration
      */
         public function up(): void
     {
-    Schema::create('lessons', function (Blueprint $table) {
-        $table->id();
-        $table->string('title');
-        $table->unsignedBigInteger('grade_id')->nullable();// Khóa ngoại liên kết với bảng grades
-        $table->string('subject')->nullable();
-        $table->text('description')->nullable();
-        $table->timestamps();
+        Schema::create('lessons', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->unsignedBigInteger('grade_id')->nullable();
+            $table->string('subject')->nullable();
+            $table->text('description')->nullable();
+            $table->timestamps();
 
-        $table->foreign('grade_id')->references('id')->on('grades')->onDelete('set null');// Khóa ngoại liên kết với bảng grades
-    });
-}
+            $table->foreign('grade_id')->references('id')->on('grades')->onDelete('set null');// Khóa ngoại liên kết với bảng grades
+        });
+    }
 
 
 

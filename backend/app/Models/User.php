@@ -51,4 +51,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Grade::class);
     }
-}
+    // Quan hệ hoàn thành bài học và bài tập
+    public function completions()
+    {
+    return $this->hasMany(\App\Models\Completion::class);
+    }
+
+}   

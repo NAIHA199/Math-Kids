@@ -22,4 +22,11 @@ class Lesson extends Model
     public function images() {
         return $this->morphMany(Image::class, 'imageable')->orderBy('created_at');
     }
+    // Quan hệ khi hoàn thành bài học 
+    public function completions()
+    {
+    return $this->morphMany(\App\Models\Completion::class, 'completable');
+    }
+
+
 }

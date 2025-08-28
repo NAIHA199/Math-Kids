@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\LessonController;
+use App\Http\Controllers\Api\ExerciseController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\CompletionController;
 
 //Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
@@ -31,3 +35,9 @@ Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);
 //Route bài tập 
 Route::get('/exercises', [ExerciseController::class, 'index']);
 Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
+
+// Progress/Complete (có thể bọc middleware auth:sanctum nếu bạn đã bật login)
+Route::post('/completions/upsert', [CompletionController::class, 'upsert']);           // lưu tiến trình/điểm
+Route::post('/completions/complete', [CompletionController::class, 'markComplete']);   // đánh dấu hoàn thành
+Route::get('/completions/mine', [CompletionController::class, 'myCompletions']);       // danh sách completion của user
+Route::get('/completions/{type}/{id}', [CompletionController::class, 'showForItem']);  // completion của 1 item
