@@ -22,6 +22,9 @@ import ReportPage from './pages/ReportPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
+// Import the new AdminLessonPage component
+import AdminLessonPage from './pages/AdminLessonPage';
+
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = getCurrentUser();
@@ -202,6 +205,13 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* New Admin route */}
+          <Route path="/admin/lessons" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminLessonPage />
+            </ProtectedRoute>
+          } />
+
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
