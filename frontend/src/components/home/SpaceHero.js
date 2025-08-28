@@ -2,15 +2,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-const SpaceHero = () => {
+// Thêm prop `onDemoClick` để nhận hàm xử lý từ component cha
+const SpaceHero = ({ onDemoClick }) => {
   const navigate = useNavigate();
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 pt-20">
-      <div className="max-w-6xl mx-auto text-center">
+      <div className="max-w-6xl mx-auto text-center relative">
         {/* Floating astronaut */}
         <motion.div
-          className="absolute right-10 top-32 text-8xl"
+          className="absolute right-10 top-32 text-8xl hidden lg:block"
           animate={{ 
             y: [0, -30, 0],
             rotate: [-5, 5, -5]
@@ -61,8 +62,10 @@ const SpaceHero = () => {
           >
             Bắt đầu học ngay 🚀
           </motion.button>
+          
+          {/* Thay đổi onClick ở đây để gọi prop được truyền vào */}
           <motion.button
-            onClick={() => navigate('/demo')}
+            onClick={onDemoClick}
             className="px-8 py-4 border-2 border-purple-500 rounded-full font-bold text-lg hover:bg-purple-500/20 transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

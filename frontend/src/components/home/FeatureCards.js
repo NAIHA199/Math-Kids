@@ -1,5 +1,5 @@
 //Giới thiệu 6 tính năng chính
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaGraduationCap, 
@@ -10,7 +10,7 @@ import {
   FaPuzzlePiece
 } from 'react-icons/fa';
 
-const FeatureCards = () => {
+const FeatureCards = forwardRef((props, ref) => {
   const features = [
     {
       icon: <FaGraduationCap size={40} />,
@@ -73,7 +73,7 @@ const FeatureCards = () => {
   };
 
   return (
-    <section className="py-20 px-4">
+    <section ref={ref} className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0 }}
@@ -122,6 +122,6 @@ const FeatureCards = () => {
       </div>
     </section>
   );
-};
+});
 
 export default FeatureCards;
