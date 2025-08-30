@@ -34,6 +34,7 @@ const RegisterPage = () => {
         role: selectedAccountType.id
       });
       
+      
       toast.success('🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục!');
       
       // Redirect to login after success

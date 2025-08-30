@@ -14,7 +14,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable, HasFactory;
 
-    protected $fillable = [ 
+    protected $fillable = [
         'role',
         'fullName',
         'email',
@@ -44,7 +44,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-        
+
     }
     // Quan hệ: 1 user thuộc về 1 grade (có thể null)
     public function grade()
@@ -56,5 +56,22 @@ class User extends Authenticatable
     {
     return $this->hasMany(\App\Models\Completion::class);
     }
+    // Trong UserObserver hoặc User model boot()
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if ($user->role === 'student') {
+                \App\Models\StudentProgress::create([
+                    'student_id' => $user->id,
+                    'total_stars' => 0,
+                    'level' => 0,
+                    'current_streak' => 0,
+                    'longest_streak' => 0,
+                    'last_activity_date' => null,
+                ]);
+            }
+        });
+    }
 
-}   
+
+}

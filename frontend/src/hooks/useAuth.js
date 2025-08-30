@@ -54,7 +54,7 @@ export const useAuth = () => {
           email,
           username,
           password,
-          password_confirmed : password,
+          password_confirmation: password,
           role,
         }),
       });

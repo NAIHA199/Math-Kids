@@ -7,6 +7,16 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 class UsersController extends Controller
 {
+    public function AdminHome (Request $request): JsonResponse
+    {
+        return response()->json([
+            'message' => 'Welcome to Admin',
+            'data' => [
+                'role' => $request->user()->role,
+                'user' => $request->user()
+            ]
+        ]);
+    }
     public function studentHome(Request $request): JsonResponse
     {
 

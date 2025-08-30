@@ -33,11 +33,11 @@ class Completion extends Model
     {
         return $this->morphTo();
     }
+/*
 
-    /**
-     * Quy tắc tính sao:
-     * - Nếu status = completed và score == 100 (cho exercise) hoặc progress == 100 (cho lesson) => stars = 1, ngược lại = 0.
-     */
+    // Quy tắc tính sao:
+    // - Nếu status = completed và score == 100 (cho exercise) hoặc progress == 100 (cho lesson) => stars = 1, ngược lại = 0.
+
     public function recalcStars(): void
     {
         $stars = 0;
@@ -52,5 +52,6 @@ class Completion extends Model
         }
 
         $this->stars = $stars;
-    }
+    }*/
 }
+

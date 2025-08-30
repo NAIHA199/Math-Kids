@@ -51,8 +51,8 @@ class AuthController extends Controller
 
         // chặn role sai từ lúc login
         if ($user->role !== $request->role) {
-        return response()->json(['message' => 'You do not have permission'], 403);
-    }
+            return response()->json(['message' => 'Role does not match'], 403);
+        }
         //Tạo token
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -83,7 +83,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã đăng xuất'
+            'message' => 'Logout successful'
         ]);
     }
 

@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CompletionController;
+use App\Http\Controllers\Api\ProgressController;;
+use App\Http\Controllers\Api\RewardController;
 
 //Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
@@ -27,12 +29,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
-//Route bài học 
+//Route bài học
 Route::get('/lessons', [LessonController::class, 'index']);
 Route::get('/lessons/{id}', [LessonController::class, 'show']);
 Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);
 
-//Route bài tập 
+//Route bài tập
 Route::get('/exercises', [ExerciseController::class, 'index']);
 Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
 
@@ -41,3 +43,14 @@ Route::post('/completions/upsert', [CompletionController::class, 'upsert']);    
 Route::post('/completions/complete', [CompletionController::class, 'markComplete']);   // đánh dấu hoàn thành
 Route::get('/completions/mine', [CompletionController::class, 'myCompletions']);       // danh sách completion của user
 Route::get('/completions/{type}/{id}', [CompletionController::class, 'showForItem']);  // completion của 1 item
+
+
+//Route cho reward ( lấy data từ lesson, exercise, games)
+Route::middleware(['auth:sanctum'])->group(function () {
+    //Route::post('/lessons/complete', [CompletionController::class, 'completeLesson']);
+    //Route::post('/games/complete',   [CompletionController::class, 'completeGame']);
+
+    Route::get('/rewards/summary',   [RewardController::class, 'summary']); // response progress + achievement
+    Route::post('/results/update', [ResultController::class, 'updateProgress']); // Cập nhật khi hs làm xong bài học/bài tập thì tăng sao, level
+    Route::get('/results/{user}', [ResultController::class, 'show']); // Trả báo cáo cho ph/gv
+});

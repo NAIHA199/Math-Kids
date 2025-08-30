@@ -35,11 +35,12 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'username.required' => 'Vui lòng nhập tên đăng nhập',
-            'username.unique' => 'Tên đăng nhập đã tồn tại',
-            'email.required' => 'Vui lòng nhập email',
-            'email.unique' => 'Email đã tồn tại',
-            'password.required' => 'Vui lòng nhập mật khẩu',
-            'password.confirmed' => 'Xác nhận mật khẩu không khớp',        ];
+            'username.required' => 'Please enter username',
+            'username.unique' => 'Username already exists',
+            'email.required' => 'Please enter email',
+            'email.unique' => 'Email already exists',
+            'password.required' => 'Please enter password',
+            'password.confirmed' => 'Password confirmation does not match',
+        ];
     }
 }
