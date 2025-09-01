@@ -25,6 +25,10 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 // Import the new AdminLessonPage component
 import AdminLessonPage from './pages/AdminLessonPage';
 
+// Import ProfilePage and SettingsPage components
+import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
+
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = getCurrentUser();
@@ -117,6 +121,20 @@ function App() {
           <Route path="/parent-home" element={
             <ProtectedRoute allowedRoles={['parent']}>
               <AuthenticatedHomePage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Profile route */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Settings route */}
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
           } />
           

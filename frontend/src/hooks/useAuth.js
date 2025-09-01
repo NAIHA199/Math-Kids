@@ -3,6 +3,12 @@ import { useState, useCallback } from 'react';
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
 
+  // Lấy thông tin người dùng hiện tại từ localStorage
+  const getCurrentUser = useCallback(() => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  }, []);
+
   const login = useCallback(async ({ username, password, role }) => {
     setIsLoading(true);
     try {
@@ -98,5 +104,5 @@ export const useAuth = () => {
     
   }, []);
 
-  return { login, register, logout, isLoading };
+  return { login, register, logout, isLoading, getCurrentUser };
 };

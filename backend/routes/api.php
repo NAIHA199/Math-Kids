@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/student-home', [UsersController::class, 'studentHome'])->middleware('role:student');
     Route::get('/teacher-home', [UsersController::class, 'teacherHome'])->middleware('role:teacher');
     Route::get('/parent-home', [UsersController::class, 'parentHome'])->middleware('role:parent');
+    Route::put('/user/update', [UsersController::class, 'update']);
 });
 
 //Route quên và reset mật khẩu

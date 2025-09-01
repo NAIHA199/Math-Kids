@@ -20,12 +20,16 @@ import {
 import { toast } from 'react-toastify';
 import { useAuth } from '../../hooks/useAuth';
 
-const AuthenticatedNavbar = ({ user }) => {
+const AuthenticatedNavbar = ({ user: propUser }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, getCurrentUser } = useAuth();
+  
+  // Sử dụng user từ props nếu có, ngược lại lấy từ localStorage
+  const user = propUser || getCurrentUser();
+  
   // Menu items based on user type
   const getMenuItems = () => {
     const baseItems = {
@@ -55,8 +59,6 @@ const AuthenticatedNavbar = ({ user }) => {
 
   const menuItems = getMenuItems();
 
-  
-
   const getUserDisplay = () => {
     switch(user?.role) {
       case 'student':
@@ -66,7 +68,8 @@ const AuthenticatedNavbar = ({ user }) => {
       case 'parent':
         return { icon: '👨‍👩‍👧‍👦', label: 'Phụ huynh' };
       default:
-        return { icon: '👤', label: 'Người dùng' };
+        // Trong trường hợp vai trò không xác định, mặc định là học sinh
+        return { icon: '🎒', label: 'Học sinh' };
     }
   };
 
