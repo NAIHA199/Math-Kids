@@ -8,10 +8,9 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('description')->nullable();
-            $table->unsignedTinyInteger('grade_level')->nullable(); // lớp nào (1-5)
-            $table->string('type')->nullable(); // ví dụ: ghep_so, dem_nhanh
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

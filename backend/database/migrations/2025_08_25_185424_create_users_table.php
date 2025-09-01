@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            
+
             $table->id();
             $table->string('fullName')->unique();
             $table->string('email')->unique();
             $table->string('username')->unique();
             $table->string('password');
-            $table->foreignId('grade_id')->nullable()->constrained('grades')->onDelete('cascade');// Thêm khóa ngoại grade_id
+            $table->unsignedBigInteger('grade_id')->nullable()->constrained('grades')->onDelete('cascade');// Thêm khóa ngoại grade_id
             $table->rememberToken();
             $table->timestamps();
             $table->enum('role', ['student', 'teacher', 'parent'])->default('student');// enum để giới hạn loại người dùng

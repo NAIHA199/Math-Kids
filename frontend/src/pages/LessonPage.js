@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 import SpaceBackground from '../components/ui/SpaceBackground';
 import { useState, useEffect } from 'react'
-import axios from "axios";
 
 // =================================================================================
 // CÁC COMPONENT ICON (SVG) ĐỂ TRÁNH LỖI IMPORT
@@ -119,14 +118,23 @@ const LessonPage = () => {
     // lưu vào completion     
     const handleComplete = async (type, id) => {
         try {
-            await axios.post("/api/completions", {
-                completable_type: type,  // "lesson" | "exercise" | "game"
-                completable_id: id,
-                progress: 100,
-                score: 100,
-                status: "completed",
-                stars: 1
+            const response = await fetch("/api/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    completable_type: type,  // "lesson" | "exercise" | "game"
+                    completable_id: id,
+                    progress: 100,
+                    score: 100,
+                    status: "completed",
+                    stars: 1
+                }),
             });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             toast.success(`🎉 Hoàn thành ${type}!`);
             navigate("/student-home");
         } catch (err) {

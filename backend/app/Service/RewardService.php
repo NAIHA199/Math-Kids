@@ -9,10 +9,11 @@ use App\Models\Reward;
 use Illuminate\Support\Facades\Auth;
 class RewardService
 {
-    public function getRewardSummary(User $user): array // gọi api summary lấy tóm tắt phần thưởng
+    //HÀM HIỂN THỊ PHẦN THƯỞNG
+    public function getRewardSummary(User $user): array
     {
         $user = Auth::user();
-        //Lấy result của học sinh để hiển thị progress
+        //Lấy data progress (sao,level,streak) của học sinh đã lưu bằng ResultService để hiển thị progress
         $progress = Result::where('user_id', $user->id)->first();
 
         // Nếu chưa có result thì khởi tạo mặc định
@@ -30,7 +31,7 @@ class RewardService
 
         // Lấy danh sách phần thưởng
         $rewards = Reward::all()->map(function ($reward) use ($progress, $user) {
-            // parse requirement (vd: "stars >= 500")
+            // kiểm tra điều kiện (vd: "stars >= 500") để mở khóa achievement
             $earned = $this->getAchievement($reward->requirement, $progress);
 
             return [
@@ -45,12 +46,12 @@ class RewardService
         });
 
         return [
-            'achievements' => $progress, // chuyển progress thành achievements
+            'achievements' => $progress, // chuyển progress thành achievements để phù hợp với frontend
             'badges' => $rewards, // chuyển achievement thành badges để phù hợp với frontend
         ];
     }
 
-    // Hàm tính toán thành tựu (Achievement) cho các mốc thưởng khác nhau
+    // HÀM KIỂM TRA THÀNH TỰU (achievement) DỰA TRÊN YÊU CẦU VÀ TIẾN ĐỘ (progress)
     private function getAchievement(string $requirement, $progress): bool
     {
         // Map progress thành array
