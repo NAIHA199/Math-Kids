@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 import SpaceBackground from '../components/ui/SpaceBackground';
 import { useState, useEffect } from 'react'
+import axios from "axios";
+
 // =================================================================================
 // CÁC COMPONENT ICON (SVG) ĐỂ TRÁNH LỖI IMPORT
 // =================================================================================
@@ -114,6 +116,25 @@ const LessonPage = () => {
     const [lessonData, setLessonData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [userAnswers, setUserAnswers] = useState({});
+    // lưu vào completion     
+    const handleComplete = async (type, id) => {
+        try {
+            await axios.post("/api/completions", {
+                completable_type: type,  // "lesson" | "exercise" | "game"
+                completable_id: id,
+                progress: 100,
+                score: 100,
+                status: "completed",
+                stars: 1
+            });
+            toast.success(`🎉 Hoàn thành ${type}!`);
+            navigate("/student-home");
+        } catch (err) {
+            console.error(err);
+            toast.error(`Lỗi khi lưu ${type}!`);
+        }
+    };
+
 
     // Mock data cho bài học
     useEffect(() => {
@@ -291,10 +312,7 @@ const LessonPage = () => {
                             </button>
                         ) : (
                             <button
-                                onClick={() => {
-                                    toast.success("🎉 Bạn đã hoàn thành bài học!");
-                                    navigate('/student-home');
-                                }}
+                                onClick={() => handleComplete("lesson", lessonData.id)}
                                 className="flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-teal-700 transition-colors"
                             >
                                 Hoàn thành
@@ -302,6 +320,7 @@ const LessonPage = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </button>
+
                         )}
                     </div>
                 </div>

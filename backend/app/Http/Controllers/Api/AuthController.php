@@ -14,10 +14,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+    
     // Đăng ký (tạo user mới đưa dữ liệu vào db)
     public function register(RegisterRequest $request): JsonResponse
     {

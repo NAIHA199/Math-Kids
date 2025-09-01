@@ -7,8 +7,8 @@ use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\ExerciseController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\CompletionController;
+use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\CompletionController;
 use App\Http\Controllers\Api\ProgressController;;
 use App\Http\Controllers\Api\RewardController;
 
@@ -39,10 +39,12 @@ Route::get('/exercises', [ExerciseController::class, 'index']);
 Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
 
 // Progress/Complete (có thể bọc middleware auth:sanctum nếu bạn đã bật login)
-Route::post('/completions/upsert', [CompletionController::class, 'upsert']);           // lưu tiến trình/điểm
-Route::post('/completions/complete', [CompletionController::class, 'markComplete']);   // đánh dấu hoàn thành
-Route::get('/completions/mine', [CompletionController::class, 'myCompletions']);       // danh sách completion của user
-Route::get('/completions/{type}/{id}', [CompletionController::class, 'showForItem']);  // completion của 1 item
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/completions/upsert', [CompletionController::class, 'upsert']);// Lưu hoặc cập nhật tiến trình
+    Route::post('/completions/complete', [CompletionController::class, 'markComplete']);//  Đánh dấu hoàn thành
+    Route::get('/completions/mine', [CompletionController::class, 'myCompletions']);// Lấy danh sách completion của user hiện tại
+    Route::get('/completions/{type}/{id}', [CompletionController::class, 'showForItem']);// Lấy completion cho 1 bài học/bài tập cụ thể
+});
 
 
 //Route cho reward ( lấy data từ lesson, exercise, games)

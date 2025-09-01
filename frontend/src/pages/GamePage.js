@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import axios from 'axios'; // ✅ Thêm import axios
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 
 
@@ -105,6 +106,23 @@ const GamePage = () => {
         }
         setUser(currentUser);
     }, [navigate]);
+    const handleComplete = async (type, id) => {
+        try {
+            await axios.post("/api/completions", {
+                completable_type: type,  // "lesson" | "exercise" | "game"
+                completable_id: id,
+                progress: 100,
+                score: 100,
+                status: "completed",
+                stars: 1
+            });
+            toast.success(`🎉 Hoàn thành ${type}!`);
+            navigate("/student-home");
+        } catch (err) {
+            console.error(err);
+            toast.error(`Lỗi khi lưu ${type}!`);
+        }
+    };
 
     const handleSelectGame = (gameId) => {
         setActiveGameId(gameId);

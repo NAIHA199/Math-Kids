@@ -57,7 +57,7 @@ class User extends Authenticatable
     return $this->hasMany(\App\Models\Completion::class);
     }
     // Trong UserObserver hoặc User model boot()
-    protected static function booted()
+    /*protected static function booted()
     {
         static::created(function ($user) {
             if ($user->role === 'student') {
@@ -71,7 +71,7 @@ class User extends Authenticatable
                 ]);
             }
         });
-    }
+    }*/
 
 
 }

@@ -11,14 +11,24 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
+    {   
+        $this->call([
+            GradeSeeder::class,
+            UserSeeder::class,
+        ]);
+
         User::factory(5)->create();
 
         $this->call([
-            RewardSeeder::class,
-            GameSeeder::class,
-            BadgesSeeder::class,
-            StudentProgressSeeder::class,
+            LessonSeeder::class,
+            SectionSeeder::class,
+            ExerciseSeeder::class,
+            ImageSeeder::class,
+            CompletionSeeder::class,
+            //RewardSeeder::class,
+           // GameSeeder::class,
+           // BadgesSeeder::class,
+          //  StudentProgressSeeder::class,
         ]);
     }
 }

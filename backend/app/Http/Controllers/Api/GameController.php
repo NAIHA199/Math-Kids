@@ -1,5 +1,5 @@
 <?php
-/*
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -163,4 +163,4 @@ class GameController extends Controller
 
     return (int)($basePoints + $bonusPoints);
 }
-*/
+
