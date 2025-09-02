@@ -8,9 +8,12 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
+            $table->string('slug')->unique();
+            $table->string('icon')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
+            $table->integer('min_points')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

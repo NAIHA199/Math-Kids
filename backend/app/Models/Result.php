@@ -11,7 +11,7 @@ class Result extends Model
 
     protected $fillable = [
         'user_id', 'stars', 'level',
-        'lessons_completed', 'streak_days'
+        'lesson_completed', 'exercises_completed', 'games_completed', 'streak_days', 'last_activity_at'
     ];
 
     public function user() {

@@ -12,7 +12,7 @@ import BanMayBayToanHoc from '../components/games/BanMayBayToanHoc';
 
 const getCurrentUser = () => ({ name: 'Student', role: 'student' });
 // 2. Định nghĩa danh sách game
-const GAMES = [
+/*const GAMES = [
     {
         id: 'meteorite-guardian',
         name: 'Vệ Binh Thiên Thạch',
@@ -41,7 +41,13 @@ const GAMES = [
         icon: '✈️',
         component: BanMayBayToanHoc,
     }
-];
+];*/
+const GAME_COMPONENTS = {
+  "meteorite-guardian": MeteoriteGuardian,
+  "space-race": CuocDuaXuyenKhong,
+  "galaxy-defense": PhongTuyenNganHa,
+  "math-plane-shooter": BanMayBayToanHoc,
+};
 
 // Component Card Game được thiết kế lại
 const GameCard = ({ game, onSelect }) => (
@@ -52,7 +58,7 @@ const GameCard = ({ game, onSelect }) => (
         exit={{ opacity: 0, scale: 0.8 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className="group relative bg-slate-800/60 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:border-purple-500 hover:-translate-y-2"
-        onClick={() => onSelect(game.id)}
+        onClick={() => onSelect(game)}
     >
         <div className="text-7xl mb-5 transition-transform duration-300 group-hover:scale-110">{game.icon}</div>
         <h2 className="text-2xl font-bold text-white mb-2">{game.name}</h2>
@@ -64,35 +70,67 @@ const GameCard = ({ game, onSelect }) => (
 );
 
 // Component Menu chọn game được thiết kế lại
-const GameMenu = ({ onSelectGame }) => (
-    <div className="w-full max-w-5xl mx-auto text-center px-4">
-        <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-5xl md:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500"
-        >
+const GameMenu = ({ onSelectGame }) => {
+    const [games, setGames] = useState([]);
+    useEffect(() => {
+        fetch("http://localhost:8000/api/games", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+            if (Array.isArray(data.data)) {
+                // gán component dựa vào id
+                const mappedGames = data.data.map(game => ({
+                ...game,
+                component: GAME_COMPONENTS[game.slug] || null
+                }));
+                setGames(mappedGames);
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching games:", err);
+        });
+    }, []);
+
+    return (
+        <div className="w-full max-w-5xl mx-auto text-center px-4">
+            <motion.h1
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-5xl md:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500"
+            >
             Trung Tâm Trò Chơi
-        </motion.h1>
-        <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-400 mb-12"
-        >
+            </motion.h1>
+            <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-gray-400 mb-12"
+            >
             Chọn một trò chơi để bắt đầu cuộc phiêu lưu tri thức của bạn!
-        </motion.p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {GAMES.map(game => (
-                <GameCard key={game.id} game={game} onSelect={onSelectGame} />
-            ))}
+            </motion.p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.isArray(games) && games.length > 0 ? (
+                    games.map(game => (
+                        <GameCard key={game.slug} game={game} onSelect={onSelectGame} />
+                    ))
+                ) : (
+                    <p className="text-gray-400"></p>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // Component GamePage chính
 const GamePage = () => {
-    const [activeGameId, setActiveGameId] = useState(null);
+    const [games, setGames] = useState([]);
+    const [activeGameSlug, setActiveGameSlug] = useState(null);
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
@@ -106,42 +144,42 @@ const GamePage = () => {
         setUser(currentUser);
     }, [navigate]);
     */
-    const handleComplete = async (type, id) => {
+    const handleComplete = async (gameId, starsEarned) => {
         try {
-            const response = await fetch("/api/completions", {
+            const response = await fetch("http://localhost:8000/api/completions/upsert", {
                 method: "POST", // Phương thức POST
                 headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
                     "Content-Type": "application/json", // Định dạng dữ liệu gửi đi là JSON
                 },
                 body: JSON.stringify({
-                    completable_type: type,  // "lesson" | "exercise" | "game"
-                    completable_id: id,
-                    progress: 100,
-                    score: 100,
+                    completable_type: "game",
+                    completable_id: gameId,
                     status: "completed",
-                    stars: 1
+                    stars: starsEarned, // số sao hiện tại
                 }),
             });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            toast.success(`🎉 Hoàn thành ${type}!`);
-            navigate("/student-home");
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Lỗi lưu completion");
+
+            console.log("✅ Completion saved:", data);
+            toast.success(`🎉 Hoàn thành trò chơi!`);
+            navigate("/games");
+            return true;        
         } catch (err) {
             console.error(err);
-            toast.error(`Lỗi khi lưu ${type}!`);
+            toast.error(`Lỗi khi lưu trò chơi!`);
         }
     };
-    const handleSelectGame = (gameId) => {
-        setActiveGameId(gameId);
+    const handleSelectGame = (game) => {
+        setActiveGameSlug(game.slug);
     };
 
     const handleBackToMenu = () => {
-        setActiveGameId(null);
+        setActiveGameSlug(null);
     };
 
-    const ActiveGame = GAMES.find(g => g.id === activeGameId)?.component;
-
+    const ActiveGame = activeGameSlug ? GAME_COMPONENTS[activeGameSlug] : null;
     return (
         <div className="min-h-screen w-full bg-black text-white overflow-hidden relative">
             {/* Simplified Space Background */}
@@ -181,7 +219,8 @@ const GamePage = () => {
                             transition={{ duration: 0.3 }}
                             className="w-full flex justify-center"
                         >
-                            <ActiveGame onBack={handleBackToMenu} />
+                            <ActiveGame game={games.find(g => g.slug === activeGameSlug)} onBack={handleBackToMenu} onComplete={handleComplete} />
+
                         </motion.div>
                     ) : (
                         <motion.div

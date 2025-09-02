@@ -36,10 +36,10 @@ const RewardPage = () => {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` }
         });
-
-        if (!response.ok) throw new Error("Không thể lấy dữ liệu reward");
-
         const data = await response.json();
+        if (!response.ok) throw new Error("Không thể lấy dữ liệu reward");
+        
+
         setRewards(
           {
             achievements: [

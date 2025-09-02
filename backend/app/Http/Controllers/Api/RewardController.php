@@ -2,34 +2,33 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Service\RewardService;
+use App\Services\RewardService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-
+use App\Services\ResultService;
 
 class RewardController extends Controller
 {
     //Khai báo RewardService
     protected $rewardService;
+    protected $resultService;
 
-    public function __construct(RewardService $rewardService)
+    public function __construct(RewardService $rewardService, ResultService $resultService)
     {
         $this->rewardService = $rewardService;
+        $this->resultService = $resultService;
     }
 
 
     // API lấy tổng quan của phần thưởng bao gồm: progress(sao, level, streak) + achievement
 
-    public function summary(Request $request)
+    public function summary()
     {
-        $user = $request->user(); // user đang login
-        $summary = $this->rewardService->getRewardSummary($user);
-
-        return response()->json($summary);
+        $userId = auth()->id();
+        return response()->json($this->rewardService->getSummary($userId));
     }
 
-    /*public function index()
+    public function index()
     {
         $rewards = Reward::where('is_active', true)
             ->orderBy('points_required')
@@ -59,7 +58,7 @@ class RewardController extends Controller
         ]);
     }
 
-    // Đổi reward
+    /*// Đổi reward
     public function claim(Request $request, $id)
     {
         $reward = Reward::where('is_active', true)->find($id);
@@ -120,9 +119,10 @@ class RewardController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
+    }*/
 
-    // Lịch sử đổi thưởng của user
+
+    /*// Lịch sử đổi thưởng của user
     public function history()
     {
         $userRewards = UserReward::where('user_id', auth()->id())

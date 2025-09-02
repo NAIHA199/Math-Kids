@@ -24,13 +24,13 @@ const SpaceShooterStyles = () => (
     `}</style>
 );
 
-const BanMayBayToanHoc = ({ onBack, onComplete }) => {
+const BanMayBayToanHoc = ({ game, onBack, onComplete }) => {
     const [gameState, setGameState] = useState('menu'); // 'menu', 'playing', 'victory', 'gameOver'
     const [level, setLevel] = useState(1);
     const [lives, setLives] = useState(5);
     const [score, setScore] = useState(0);
     const [question, setQuestion] = useState(null);
-    
+    const [starsEarned, setStarsEarned] = useState(0);
     // State cho gameplay mới
     const [playerPos, setPlayerPos] = useState({ x: 400, y: 520 });
     const [enemies, setEnemies] = useState([]);
@@ -47,6 +47,7 @@ const BanMayBayToanHoc = ({ onBack, onComplete }) => {
     useEffect(() => {
         stateRef.current = { enemies, projectiles, level, score, lives, question };
     });
+    /* hàm này lưu kết quả lại sau mỗi lần chơi xong để tạo lịch sử chơi game 
     const saveGameResult = async (score, stars) => {
         try {
             const res = await fetch("http://localhost:8000/api/games/4/complete", {
@@ -66,7 +67,9 @@ const BanMayBayToanHoc = ({ onBack, onComplete }) => {
         } catch (err) {
             console.error("Error saving game result:", err);
         }
-    };
+    };*/
+
+  
 
     const generateQuestionForLevel = useCallback((currentLevel) => {
         let num1, num2, op, text, answer;
@@ -126,6 +129,7 @@ const BanMayBayToanHoc = ({ onBack, onComplete }) => {
         setLevel(1);
         setLives(5);
         setScore(0);
+        setStarsEarned(0);
         setPlayerPos({ x: 400, y: 520 });
         setProjectiles([]);
         generateQuestionForLevel(1);
@@ -165,7 +169,10 @@ const BanMayBayToanHoc = ({ onBack, onComplete }) => {
                         toast.error("Bỏ lỡ đáp án đúng!");
                         setLives(l => {
                             const newLives = l - 1;
-                            if (newLives <= 0) setGameState('gameOver');
+                            if (newLives <= 0) {
+                                setGameState('gameOver');
+                                onComplete?.(4, starsEarned);
+                            }
                             return newLives;
                         });
                     }
@@ -196,26 +203,28 @@ const BanMayBayToanHoc = ({ onBack, onComplete }) => {
 
                 if (hitEnemy.isCorrect) {
                     toast.success('Chính xác!');
-                    setScore(s => s + stateRef.current.level * 10);
+                    setStarsEarned(prevStars => prevStars + 1);
+                   
                     setLevel(l => {
-                        const newLevel = l + 1;
-                        if (newLevel > 20) {
-                            setGameState('victory');
-                            saveGameResult(stateRef.current.score, 10); // Lưu kết quả với 10 sao khi thắng
-                        } else {
-                            generateQuestionForLevel(newLevel);
-                        }
-                        return newLevel;
+                            const newLevel = l + 1;
+                            if (newLevel > 20) {
+                                setGameState('victory');
+                                onComplete?.(4, starsEarned + 1);
+                            } else {
+                                generateQuestionForLevel(newLevel);
+                            }
+                            return newLevel;
                     });
+                   
                 } else {
                     toast.error('Sai rồi!');
                     setLives(l => {
                         const newLives = l - 1;
                         if (newLives <= 0)  {
                             setGameState('gameOver');
-                            saveGameResult(stateRef.current.score, 1); // Lưu kết quả với 1 sao khi thua
+                            onComplete?.(4, starsEarned); // Lưu kết quả với 1 sao khi thua
                         }
-                            
+
                         return newLives;
                     });
                 }
@@ -239,17 +248,15 @@ const BanMayBayToanHoc = ({ onBack, onComplete }) => {
     }
     
     if (gameState === 'victory' || gameState === 'gameOver') {
-        const stars = gameState === "victory" ? 3 : 1; // thắng thì 3 sao, thua thì 1 sao
-        onComplete(score, stars);
         return (
            <div className="relative w-full max-w-4xl h-[600px] game-container-shooter border-2 border-purple-500 rounded-lg mx-auto flex justify-center items-center">
                <SpaceShooterStyles />
                <div className="text-center text-white z-10 p-8 bg-black/70 rounded-lg">
                    <h2 className="text-5xl font-bold mb-4">{gameState === 'victory' ? '🎉 BẠN ĐÃ THẮNG! 🎉' : 'THUA CUỘC!'}</h2>
-                   <p className="text-3xl mb-6">Điểm số cuối cùng: <span className="text-yellow-400">{score}</span></p>
+                   <p className="text-3xl mb-6">Số sao nhận được: <span className="text-yellow-400">{starsEarned}</span></p>
                    <div className="space-x-4">
                        <button onClick={onBack} className="px-6 py-3 bg-gray-600 rounded-lg font-bold hover:bg-gray-700">Quay lại</button>
-                       <button onClick={onComplete} className="px-6 py-3 bg-gray-600 rounded-lg font-bold hover:bg-gray-700">Lưu kết quả</button>
+                       <button onClick={() => setStarsEarned(prev => {onComplete(4, prev); return prev})} className="px-6 py-3 bg-gray-600 rounded-lg font-bold hover:bg-gray-700">Lưu kết quả</button>
                        <button onClick={startGame} className="px-6 py-3 bg-purple-600 rounded-lg font-bold hover:bg-purple-700">Chơi lại</button>
                    </div>
                </div>

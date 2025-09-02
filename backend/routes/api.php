@@ -11,7 +11,8 @@ use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\CompletionController;
 use App\Http\Controllers\Api\ProgressController;;
 use App\Http\Controllers\Api\RewardController;
-
+use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\ResultController;
 //Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -39,6 +40,15 @@ Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);
 Route::get('/exercises', [ExerciseController::class, 'index']);
 Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
 
+//Route game
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/games', [GameController::class, 'index']);
+    Route::get('/games/{id}', [GameController::class, 'show']);
+    Route::post('/games/{game}/complete', [GameController::class, 'complete']);//Route::post('/games/{id}/complete', [GameController::class, 'saveResult']);
+    //Route::get('/games/history', [GameController::class, 'history']);
+    //Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard']);
+});
+
 // Progress/Complete (có thể bọc middleware auth:sanctum nếu bạn đã bật login)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/completions/upsert', [CompletionController::class, 'upsert']);// Lưu hoặc cập nhật tiến trình
@@ -48,11 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+
+
 //Route cho reward ( lấy data từ lesson, exercise, games)
 Route::middleware(['auth:sanctum'])->group(function () {
-    //Route::post('/lessons/complete', [CompletionController::class, 'completeLesson']);
-    //Route::post('/games/complete',   [CompletionController::class, 'completeGame']);
 
+    Route::get('/rewards', [RewardController::class, 'index']);
     Route::get('/rewards/summary',   [RewardController::class, 'summary']); // response progress + achievement
     Route::post('/results/update', [ResultController::class, 'updateProgress']); // Cập nhật khi hs làm xong bài học/bài tập thì tăng sao, level
     Route::get('/results/{user}', [ResultController::class, 'show']); // Trả báo cáo cho ph/gv

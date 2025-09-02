@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {   
+    {
         $this->call([
             GradeSeeder::class,
             UserSeeder::class,
@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             ExerciseSeeder::class,
             ImageSeeder::class,
             CompletionSeeder::class,
-            //RewardSeeder::class,
-           // GameSeeder::class,
+            RewardSeeder::class,
+            GameSeeder::class,
            // BadgesSeeder::class,
           //  StudentProgressSeeder::class,
         ]);

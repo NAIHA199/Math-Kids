@@ -31,7 +31,7 @@ const GameStyles = () => (
 );
 
 // Component chính của game
-const CuocDuaXuyenKhong = ({ onBack }) => {
+const CuocDuaXuyenKhong = ({ onBack, onComplete }) => {
     const [gameState, setGameState] = useState('menu'); // 'menu', 'playing', 'levelComplete', 'gameOver'
     const [score, setScore] = useState(0);
     const [playerPosition, setPlayerPosition] = useState(0);
@@ -41,8 +41,57 @@ const CuocDuaXuyenKhong = ({ onBack }) => {
     const [feedback, setFeedback] = useState('');
     const [lives, setLives] = useState(3);
 
-    const generateQuestion = useCallback(() => {
-        const num1 = Math.floor(Math.random() * (level * 4)) + level;
+    // 🔥 Hàm tính số sao dựa trên điểm
+    const calculateStars = (finalScore) => {
+        return Math.min(3, Math.floor(finalScore / 50));
+    };
+
+    const handleGameOver = () => {
+        setGameState('gameOver');
+        const stars = calculateStars(score);
+        onComplete?.(2, stars); // 👈 gameId = 5
+    };
+    const handleVictory = () => {
+        setGameState('gameOver');
+        const stars = calculateStars(score);
+        onComplete?.(2, stars);
+    };
+
+    // Khi trả lời sai hết mạng → game over
+    const handleAnswerClick = (answer) => {
+        if (gameState !== 'playing') return;
+
+        if (answer === question.answer) {
+            setFeedback('correct');
+            setPlayerPosition(prev => Math.min(prev + 15, 100));
+            setScore(prevScore => prevScore + 10);
+            setTimeout(prepareNewRound, 400);
+        } else {
+            setFeedback('incorrect');
+            toast.error('Sai rồi, -1 mạng!', { icon: '💔' });
+            setLives(prevLives => {
+                const newLives = prevLives - 1;
+                if (newLives <= 0) {
+                    handleGameOver();
+                }
+                return newLives;
+            });
+        }
+
+        setTimeout(() => setFeedback(''), 500);
+    };
+
+    // Khi đạt đến 1 mốc thắng cuối (ví dụ level 10 → thắng hẳn game)
+    useEffect(() => {
+        if (level > 10 && gameState === 'playing') {
+            handleVictory();
+        }
+    }, [level, gameState]);
+
+
+    const generateQuestion = useCallback((customLevel) => {
+        const currentLevel = customLevel ?? level;
+        const num1 = Math.floor(Math.random() * (currentLevel * 4)) + currentLevel;
         const num2 = Math.floor(Math.random() * 9) + 2;
         const operations = ['+', '-', '×'];
         const op = operations[Math.floor(Math.random() * operations.length)];
@@ -65,8 +114,8 @@ const CuocDuaXuyenKhong = ({ onBack }) => {
         return { text, answer };
     }, [level]);
 
-    const prepareNewRound = useCallback(() => {
-        const newQuestion = generateQuestion();
+    const prepareNewRound = useCallback((customLevel) => {
+        const newQuestion = generateQuestion(customLevel ?? level);
         setQuestion(newQuestion);
 
         let answerOptions = new Set([newQuestion.answer]);
@@ -94,38 +143,19 @@ const CuocDuaXuyenKhong = ({ onBack }) => {
             toast.success(`🎉 Hoàn thành Cấp độ ${level}!`, { autoClose: 2500 });
 
             setTimeout(() => {
-                setLevel(prevLevel => prevLevel + 1);
-                setPlayerPosition(0);
-                setScore(prevScore => prevScore + 100 * level);
-                prepareNewRound();
-                setGameState('playing');
+                setLevel(prevLevel => {
+                    const nextLevel = prevLevel + 1;
+                    setPlayerPosition(0);
+                    setScore(prevScore => prevScore + 100 * prevLevel);
+                    prepareNewRound(nextLevel); // ✅ chuyền level mới
+                    setGameState('playing');
+                    return nextLevel;
+                });
             }, 2500);
         }
     }, [playerPosition, gameState, level, prepareNewRound]);
 
-    const handleAnswerClick = (answer) => {
-        if (gameState !== 'playing') return;
-
-        if (answer === question.answer) {
-            setFeedback('correct');
-            setPlayerPosition(prev => Math.min(prev + 15, 100));
-            setScore(prevScore => prevScore + 10);
-            setTimeout(prepareNewRound, 400);
-        } else {
-            setFeedback('incorrect');
-            toast.error('Sai rồi, -1 mạng!', { icon: '💔' });
-            setLives(prevLives => {
-                const newLives = prevLives - 1;
-                if (newLives <= 0) {
-                    setGameState('gameOver');
-                }
-                return newLives;
-            });
-        }
-
-        setTimeout(() => setFeedback(''), 500);
-    };
-
+   
     if (gameState === 'menu') {
         return (
             <div className="text-center p-8 bg-gray-900 text-white rounded-lg w-full max-w-4xl mx-auto">
@@ -149,6 +179,7 @@ const CuocDuaXuyenKhong = ({ onBack }) => {
                         <p className="text-3xl mb-6 text-white">Tổng điểm: <span className="text-yellow-400">{score}</span></p>
                         <div className="space-x-4">
                             <button onClick={onBack} className="px-6 py-3 bg-gray-600 text-white rounded-lg font-bold hover:bg-gray-700 transition-colors">Quay lại</button>
+                            <button onClick={() => { const stars = calculateStars(score); onComplete?.(2,stars);}} className="px-6 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition-colors">Lưu kết quả</button>
                             <button onClick={startGame} className="px-6 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition-colors">Chơi lại</button>
                         </div>
                     </div>

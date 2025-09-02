@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -30,6 +30,35 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
   // Sử dụng user từ props nếu có, ngược lại lấy từ localStorage
   const user = propUser || getCurrentUser();
   
+  // ⭐ State lưu stars
+  const [stars, setStars] = useState(0);
+  // Gọi API để lấy stars từ /api/rewards/summary
+  useEffect(() => {
+    const fetchStars = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/rewards/summary', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Lỗi khi gọi API rewards/summary");
+        }
+
+        const data = await res.json();
+        setStars(data.achievement?.stars || 0);
+      } catch (err) {
+        console.error("Lỗi khi lấy stars:", err);
+      }
+    };
+    if (user?.role === 'student') {
+      fetchStars();
+    }
+  }, [user?.role]);
+
   // Menu items based on user type
   const getMenuItems = () => {
     const baseItems = {
@@ -134,7 +163,7 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
                 whileHover={{ scale: 1.05 }}
               >
                 <FaStar className="text-yellow-400" />
-                <span className="font-bold text-yellow-400">1,250</span>
+                <span className="font-bold text-yellow-400">{stars}</span>
               </motion.div>
             )}
 

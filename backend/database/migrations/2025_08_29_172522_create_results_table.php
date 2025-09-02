@@ -19,7 +19,8 @@ return new class extends Migration
             $table->integer('lesson_completed')->default(0); // Số bài học đã hoàn thành
             $table->integer('exercises_completed')->default(0); // Số bài tập đã hoàn thành
             $table->integer('games_completed')->default(0); // Số trò chơi đã hoàn thành
-            $table->integer('streak_days')->default(0); // Chuỗi ngày học
+            $table->integer('streak_days')->default(0); // Số ngày streak hiện tại
+            $table->timestamp('last_activity_at')->nullable(); // Thời gian hoạt động cuối
             $table->timestamps();
         });
     }

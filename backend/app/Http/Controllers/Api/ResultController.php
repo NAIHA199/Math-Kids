@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Result;
-use App\Service\ResultService;
+use App\Services\ResultService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,7 +47,7 @@ class ResultController extends Controller
     //API Lấy báo cáo cho home hiển thị
     public function show(User $student)
     {
-        $report = $this->resultService->getLearningReport($student);
+        $report = $this->resultService->buildParentReport($student->id);
 
         return response()->json($report);
     }

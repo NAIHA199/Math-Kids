@@ -10,9 +10,14 @@ class game extends Model
     use HasFactory;
 
     protected $fillable = [
-        'code',
+        'slug',
+        'icon',
         'name',
         'description',
+        'min_points',
+        'is_active'
+
+
     ];
     public function completions()
     {

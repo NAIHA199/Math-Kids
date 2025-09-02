@@ -35,6 +35,13 @@ const WAVES = [
     { enemies: [...Array(15).fill('standard'), { type: 'tank', delay: 5000 }] },
 ];
 
+// Function to calculate stars based on waves completed
+const calculateStars = (wavesCompleted) => {
+    if (wavesCompleted >= 2) return 3;
+    if (wavesCompleted >= 1) return 2;
+    return 1;
+};
+
 // =================================================================================
 // HÀM TIỆN ÍCH & VẼ
 // =================================================================================
@@ -108,7 +115,7 @@ const MathQuestionModal = ({ question, onAnswer }) => {
 // =================================================================================
 // COMPONENT CHÍNH
 // =================================================================================
-const PhongTuyenNganHa = ({ onBack }) => {
+const PhongTuyenNganHa = ({ game, onBack, onComplete }) => {
     const canvasRef = useRef(null);
     const [gameState, setGameState] = useState('menu');
     const [lives, setLives] = useState(CONFIG.LIVES);
@@ -463,14 +470,17 @@ const PhongTuyenNganHa = ({ onBack }) => {
     }
     
     if (gameState === 'gameOver' || gameState === 'victory') {
+        const stars = calculateStars(wave);
          return (
             <div className="relative w-full max-w-4xl text-white text-center bg-slate-800 p-8 rounded-xl shadow-2xl">
                 <h2 className="text-6xl font-bold mb-4">
                     {gameState === 'victory' ? 'Chiến Thắng! 🏆' : 'Thất Bại! 💔'}
                 </h2>
                 <p className="text-3xl mb-6">Bạn đã qua được {wave} đợt.</p>
+                <p className="text-2xl mb-4">Số sao nhận được: <span className="text-yellow-400">{stars} ⭐</span></p>
                 <div className="space-x-4">
                     <button onClick={onBack} className="px-6 py-3 bg-gray-600 rounded-lg font-bold hover:bg-gray-700 transition-colors">Quay lại</button>
+                    <button onClick={() => onComplete(3, stars)} className="px-6 py-3 bg-green-600 rounded-lg font-bold hover:bg-green-700 transition-colors">Lưu kết quả</button>
                     <button onClick={startGame} className="px-6 py-3 bg-purple-600 rounded-lg font-bold hover:bg-purple-700 transition-colors">Chơi lại</button>
                 </div>
             </div>
