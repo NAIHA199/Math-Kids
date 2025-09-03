@@ -37,7 +37,7 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
     const fetchStars = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('/api/rewards/summary', {
+        const res = await fetch('http://localhost:8000/api/rewards/summary', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
         }
 
         const data = await res.json();
-        setStars(data.achievement?.stars || 0);
+        setStars(data.achievements?.stars || 0);
       } catch (err) {
         console.error("Lỗi khi lấy stars:", err);
       }

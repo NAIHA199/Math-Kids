@@ -20,6 +20,8 @@ const StudentHome = ({ user }) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState(null);
+  const [achievements, setAchievements] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     fetch("http://127.0.0.1:8000/api/student-home", {
@@ -31,9 +33,21 @@ const StudentHome = ({ user }) => {
       .then(response => response.json())
       .then(setData)
       .catch(error => console.error('API error:', error));
-  }, []);
 
-  if(!data) return <p>Loading...</p>
+    fetch("http://127.0.0.1:8000/api/rewards/summary", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .then(response => setAchievements(response.achievements))
+      .catch(error => {
+        console.error("API error (rewards/summary):", error);
+        setAchievements({ stars: 0, level: 0, streak: 0 });
+      });
+  }, []);
+  if (!data || !achievements) return <p>Loading...</p>;
   // Daily missions
   const dailyMissions = [
     { id: 1, title: 'Hoàn thành 3 bài học', progress: 1, total: 3, reward: 50 },
@@ -119,7 +133,7 @@ const StudentHome = ({ user }) => {
               className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-md rounded-2xl p-6 border border-yellow-500/30"
             >
               <FaStar className="text-3xl text-yellow-400 mb-2" />
-              <p className="text-3xl font-bold text-yellow-400">1,250</p>
+              <p className="text-3xl font-bold text-yellow-400">{achievements.stars}</p>
               <p className="text-sm text-gray-400">Tổng sao</p>
             </motion.div>
 
@@ -128,7 +142,7 @@ const StudentHome = ({ user }) => {
               className="bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-md rounded-2xl p-6 border border-orange-500/30"
             >
               <FaFire className="text-3xl text-orange-400 mb-2" />
-              <p className="text-3xl font-bold text-orange-400">7</p>
+              <p className="text-3xl font-bold text-orange-400">{achievements.streak_days}</p>
               <p className="text-sm text-gray-400">Chuỗi ngày</p>
             </motion.div>
 
@@ -137,7 +151,7 @@ const StudentHome = ({ user }) => {
               className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30"
             >
               <FaTrophy className="text-3xl text-purple-400 mb-2" />
-              <p className="text-3xl font-bold text-purple-400">Level 8</p>
+              <p className="text-3xl font-bold text-purple-400">{achievements.level}</p>
               <p className="text-sm text-gray-400">Cấp độ</p>
             </motion.div>
 
