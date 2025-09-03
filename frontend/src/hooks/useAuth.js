@@ -36,7 +36,7 @@ export const useAuth = () => {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('token', data.token);
       
-      return { success: true };
+      return { success: true, user: data.user };
     } catch (error) {
       throw new Error('Login failed');
     } finally {
@@ -44,9 +44,24 @@ export const useAuth = () => {
     }
   }, []);
 
-  const register = useCallback(async ({ fullName, email, username, password, role }) => {
+  const register = useCallback(async ({ fullName, email, username, password, role, childEmail }) => {
     setIsLoading(true);
     try {
+      // Chuẩn bị dữ liệu để gửi
+      const registerData = {
+        fullName,
+        email,
+        username,
+        password,
+        password_confirmation: password,
+        role,
+      };
+      
+      // Nếu là phụ huynh, thêm email của con
+      if (role === 'parent' && childEmail) {
+        registerData.childEmail = childEmail;
+      }
+      
       // Simulate API call
       //await new Promise(resolve => setTimeout(resolve, 2000));
       const res = await fetch('http://127.0.0.1:8000/api/register', {
@@ -55,14 +70,7 @@ export const useAuth = () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          fullName,
-          email,
-          username,
-          password,
-          password_confirmation: password,
-          role,
-        }),
+        body: JSON.stringify(registerData),
       });
       const data = await res.json();
       if (!res.ok) {
