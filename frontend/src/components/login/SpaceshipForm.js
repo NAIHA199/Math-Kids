@@ -23,7 +23,7 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
     username: '', 
     password: '',
     password_confirmation: '',
-    childEmail: '' // Thêm trường email con cho phụ huynh
+    parentEmail: '' // Thêm trường email phụ huynh cho học sinh
   });
   const [errors, setErrors] = useState({});
   const [fuel, setFuel] = useState(0);
@@ -45,16 +45,16 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
       if (data.username.length >= 3) fuelLevel += 50;
       if (data.password.length >= 6) fuelLevel += 50;
     } else {
-      // Đối với phụ huynh, chia đều 6 trường thông tin (100/6 ≈ 16.67% mỗi trường)
-      if (accountType.id === 'parent') {
+      // Đối với học sinh, chia đều 6 trường thông tin (100/6 ≈ 16.67% mỗi trường)
+      if (accountType.id === 'student') {
         if (data.fullName.length >= 2) fuelLevel += 16.67;
         if (data.username.length >= 3) fuelLevel += 16.67;
         if (data.email.includes('@')) fuelLevel += 16.67;
         if (data.password.length >= 6) fuelLevel += 16.67;
         if (data.password === data.password_confirmation && data.password.length >= 6) fuelLevel += 16.67;
-        if (data.childEmail.includes('@')) fuelLevel += 16.67;
+        if (data.parentEmail.includes('@')) fuelLevel += 16.67;
       } else {
-        // Logic cũ cho học sinh và giáo viên
+        // Logic cũ cho giáo viên và phụ huynh
         if (data.fullName.length >= 2) fuelLevel += 20;
         if (data.username.length >= 3) fuelLevel += 20;
         if (data.email.includes('@')) fuelLevel += 20;
@@ -91,9 +91,9 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
         newErrors.password_confirmation = 'Mật khẩu xác nhận không khớp!';
       }
       
-      // Đối với phụ huynh, thêm kiểm tra email con
-      if (accountType.id === 'parent' && !formData.childEmail) {
-        newErrors.childEmail = 'Cần email của con!';
+      // Đối với học sinh, thêm kiểm tra email phụ huynh
+      if (accountType.id === 'student' && !formData.parentEmail) {
+        newErrors.parentEmail = 'Cần email của phụ huynh!';
       }
     }
     
@@ -182,17 +182,17 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
                     placeholder="email@example.com"
                   />
                   
-                  {/* Thêm trường nhập email con cho phụ huynh */}
-                  {accountType.id === 'parent' && (
+                  {/* Thêm trường nhập email phụ huynh cho học sinh */}
+                  {accountType.id === 'student' && (
                     <ControlPanel
                       icon={<FaUser />}
-                      label="Email của con"
-                      name="childEmail"
+                      label="Email của phụ huynh"
+                      name="parentEmail"
                       type="email"
-                      value={formData.childEmail}
-                      onChange={(e) => updateField('childEmail', e.target.value)}
-                      error={errors.childEmail}
-                      placeholder="Email của con bạn đã đăng ký"
+                      value={formData.parentEmail}
+                      onChange={(e) => updateField('parentEmail', e.target.value)}
+                      error={errors.parentEmail}
+                      placeholder="Email của phụ huynh"
                     />
                   )}
 
