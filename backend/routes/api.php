@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\RewardController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\GradeController;
+use App\Http\Controllers\Api\ReportController;
 //Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -81,4 +82,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/results/update', [ResultController::class, 'updateProgress']); // Cập nhật khi hs làm xong bài học/bài tập thì tăng sao, level
     Route::get('/results/{user}', [ResultController::class, 'show']); // Trả báo cáo cho ph/gv
 });
+
+//Route báo cáo (dành cho giáo viên)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/report/summary', [ReportController::class, 'summary']);
+    Route::get('/report/class-progress', [ReportController::class, 'classProgress']);
+    Route::get('/report/leaderboard', [ReportController::class, 'leaderboard']);
+});
+
 
