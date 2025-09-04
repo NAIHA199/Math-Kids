@@ -21,8 +21,10 @@ const StudentHome = ({ user }) => {
 
   const [data, setData] = useState(null);
   const [achievements, setAchievements] = useState(null);
-
-  useEffect(() => {
+  const gamesCompleted = data?.games_completed ?? 0;
+  const total_games = 4;
+  // Khai báo state ở trên cùng
+  const fetchStudentData = async () => {
     const token = localStorage.getItem('token');
     fetch("http://127.0.0.1:8000/api/student-home", {
       headers: {
@@ -34,6 +36,7 @@ const StudentHome = ({ user }) => {
       .then(setData)
       .catch(error => console.error('API error:', error));
 
+    
     fetch("http://127.0.0.1:8000/api/rewards/summary", {
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +49,16 @@ const StudentHome = ({ user }) => {
         console.error("API error (rewards/summary):", error);
         setAchievements({ stars: 0, level: 0, streak: 0 });
       });
+  };
+  useEffect(() => {
+    fetchStudentData();
   }, []);
+  // Hàm gọi khi người chơi hoàn thành 1 game
+  const handleGameCompleted = () => {
+    fetchStudentData(); // Cập nhật lại dữ liệu từ API
+  };
+
+
   if (!data || !achievements) return <p>Loading...</p>;
   // Daily missions
   const dailyMissions = [
@@ -204,17 +216,17 @@ const StudentHome = ({ user }) => {
               <div className="bg-gray-900/50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Trò chơi</h3>
-                  <span className="text-purple-400 font-bold">72%</span>
+                  <span className="text-purple-400 font-bold">{Math.round(( achievements.games_completed / total_games) * 100)}%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-3">
                   <motion.div 
                     className="bg-gradient-to-r from-purple-400 to-pink-400 h-3 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: "72%" }}
+                    animate={{ width: `${( achievements.games_completed / total_games) * 100}%` }}
                     transition={{ duration: 1, delay: 0.9 }}
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-2">18/25 trò chơi hoàn thành</p>
+                <p className="text-xs text-gray-400 mt-2">{ achievements.games_completed }/{total_games} trò chơi hoàn thành</p>
               </div>
             </div>
           </motion.div>
