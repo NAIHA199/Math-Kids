@@ -182,34 +182,34 @@ const StudentHome = ({ user }) => {
               <div className="bg-gray-900/50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Bài học</h3>
-                  <span className="text-blue-400 font-bold">78%</span>
+                  <span className="text-blue-400 font-bold">0%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-3">
                   <motion.div 
                     className="bg-gradient-to-r from-blue-400 to-cyan-400 h-3 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: "78%" }}
+                    animate={{ width: "0%" }}
                     transition={{ duration: 1, delay: 0.5 }}
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-2">32/41 bài học hoàn thành</p>
+                <p className="text-xs text-gray-400 mt-2">0/40 bài học hoàn thành</p>
               </div>
               
               {/* Exercises Progress */}
               <div className="bg-gray-900/50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">Bài tập</h3>
-                  <span className="text-green-400 font-bold">85%</span>
+                  <span className="text-green-400 font-bold">0%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-3">
                   <motion.div 
                     className="bg-gradient-to-r from-green-400 to-teal-400 h-3 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: "85%" }}
+                    animate={{ width: "0%" }}
                     transition={{ duration: 1, delay: 0.7 }}
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-2">42/50 bài tập hoàn thành</p>
+                <p className="text-xs text-gray-400 mt-2">0/20 bài tập hoàn thành</p>
               </div>
               
               {/* Games Progress */}
@@ -233,10 +233,10 @@ const StudentHome = ({ user }) => {
         </motion.section>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Quick Actions */}
+        {/*<div className="grid lg:grid-cols-3 gap-6">
+          {/* Left Column - Quick Actions 
           <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions */}
+            {/* Quick Actions 
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -289,7 +289,7 @@ const StudentHome = ({ user }) => {
               </div>
             </motion.div>
 
-            {/* Recent Activities */}
+            {/* Recent Activities 
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -334,9 +334,9 @@ const StudentHome = ({ user }) => {
             </motion.div>
           </div>
 
-          {/* Right Column - Daily Missions & Rewards */}
+          {/* Right Column - Daily Missions & Rewards *
           <div className="space-y-6">
-            {/* Daily Missions */}
+            {/* Daily Missions *
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -379,7 +379,7 @@ const StudentHome = ({ user }) => {
               </motion.button>
             </motion.div>
 
-            {/* Special Event */}
+            {/* Special Event *
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -406,7 +406,7 @@ const StudentHome = ({ user }) => {
               </div>
             </motion.div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

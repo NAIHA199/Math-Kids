@@ -59,12 +59,17 @@ class User extends Authenticatable
 
     public function children()
     {
-        return $this->belongsToMany(User::class, 'parent_student', 'parent_id', 'student_id');
+        return $this->belongsToMany(User::class, 'parent_student', 'parent_id', 'student_id')->where('role', 'student');
     }
 
     public function parents()
     {
-        return $this->belongsToMany(User::class, 'parent_student', 'student_id', 'parent_id');
+        return $this->belongsToMany(User::class, 'parent_student', 'student_id', 'parent_id')->where('role', 'parent');
+    }
+
+    public function result()
+    {
+        return $this->hasOne(Result::class);
     }
 
     // Trong UserObserver hoặc User model boot()

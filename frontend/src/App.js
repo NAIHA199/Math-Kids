@@ -23,7 +23,7 @@ import AdminLessonPage from './pages/AdminLessonPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import ExerciseDetailPage from './pages/ExerciseDetailPage';
-
+import { useLocation } from 'react-router-dom';
 import { getCurrentUser } from './utils/helpers';
 
 // Protected Route
@@ -44,7 +44,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 // Public Route
 const PublicRoute = ({ children }) => {
   const user = getCurrentUser();
+  const location = useLocation();
   if (user) {
+    if (location.pathname === '/register' && user.role !== 'parent') {
+      return children;
+    }
     switch(user.role) {
       case 'student': return <Navigate to="/student-home" replace />;
       case 'teacher': return <Navigate to="/teacher-home" replace />;

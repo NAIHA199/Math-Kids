@@ -27,11 +27,13 @@ class CompletionController extends Controller
             'progress'         => 'nullable|integer|min:0|max:100',
             'score'            => 'nullable|integer|min:0|max:100',
             'status'           => 'nullable|string',
+            'stars'            => 'required|integer|min:0',
         ]);
 
         $user = $request->user();
         $completableTypeClass = 'App\\Models\\' . ucfirst($data['completable_type']);
 
+        $starsToAward = $data['stars'];
         // Gọi ProgressService → nó sẽ tự recalc stars
         $completion = $this->progressService->recordCompletion(
             $user,
@@ -39,7 +41,8 @@ class CompletionController extends Controller
             $data['completable_id'],
             $data['progress'] ?? 0,
             $data['score'] ?? 0,
-            $data['status'] ?? 'completed'
+            $data['status'] ?? 'completed',
+            $starsToAward
         );
 
         return response()->json([

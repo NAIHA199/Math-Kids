@@ -269,7 +269,7 @@ const BanMayBayToanHoc = ({ game, onBack, onComplete }) => {
             <SpaceShooterStyles />
             {/* Header */}
             <div className="w-full text-white flex justify-between items-center z-10">
-                <div className="text-2xl font-bold">Điểm: <span className="text-yellow-400">{score}</span></div>
+                <div className="text-2xl font-bold">Sao: <span className="text-yellow-400">{starsEarned}</span></div>
                 <div className="text-2xl font-bold">Cấp độ: <span className="text-green-400">{level}</span></div>
                 <div className="text-2xl font-bold">Mạng: <span className="text-red-500 text-3xl">{'♥'.repeat(lives)}</span></div>
             </div>

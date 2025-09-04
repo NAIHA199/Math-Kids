@@ -25,7 +25,9 @@ class ProgressService
         string $completableType,
         int $completableId,
         ?int $progress = null,
-        ?int $score = null
+        ?int $score = null,
+        ?string $status = null,
+        ?int $stars = null
     ): Completion {
         $completion = Completion::firstOrNew([
             'user_id'          => $user->id,
@@ -35,8 +37,10 @@ class ProgressService
 
         // Nếu mới tạo thì set cơ bản
         if (!$completion->exists) {
-            $completion->status = 'completed';
+            $completion->stars = $stars ?? 1;
+            $completion->status = $status ?? 'completed';
             $completion->completed_at = Carbon::now();
+            $completion->save();
         }
 
         // Cập nhật progress/score
@@ -47,13 +51,17 @@ class ProgressService
             $completion->score = $score;
         }
 
-        // Tính lại số sao dựa trên progress/score
+        // Tính lại số sao dựa trên progress/score chỉ nếu progress/score > 0
         $oldStars = $completion->stars ?? 0;
-        $completion->recalcStars();
-
-        // Chỉ update nếu sao mới ≥ sao cũ
-        if ($completion->stars < $oldStars) {
-            $completion->stars = $oldStars;
+        if ($progress > 0 || $score > 0) {
+            $completion->recalcStars();
+            // Chỉ update nếu sao mới ≥ sao cũ
+            if ($completion->stars < $oldStars) {
+                $completion->stars = $oldStars;
+            }
+        } else if ($stars > $completion->stars) {
+            $completion->stars = $stars;
+            $completion->save();
         }
 
         $completion->save();

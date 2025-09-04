@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FaArrowLeft } from 'react-icons/fa';
@@ -14,10 +14,19 @@ import { useAuth } from '../hooks/useAuth';
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register, login, isLoading } = useAuth();
-  
   // States
   const [currentStep, setCurrentStep] = useState('accountType');
   const [selectedAccountType, setSelectedAccountType] = useState(null);
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const type = searchParams.get('type');
+    if (type === 'student') {
+      setSelectedAccountType({ id: 'student', name: 'Học sinh' });
+      setCurrentStep('registerForm');
+    }
+  }, [searchParams]);
 
   // Handle account type selection
   const handleAccountTypeSelect = (type) => {

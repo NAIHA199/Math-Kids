@@ -6,7 +6,6 @@ use App\Models\Reward;
 use App\Models\User;
 use App\Models\Result;
 use App\Models\StudentAchievement;
-use Illuminate\Support\Facades\Log;
 class RewardService
 {
     /**

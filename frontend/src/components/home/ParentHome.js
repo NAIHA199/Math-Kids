@@ -1,26 +1,32 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FaChild, 
-  FaChartLine, 
+import {
+  FaChild,
+  FaChartLine,
   FaTrophy,
   FaCalendar,
   FaBell,
   FaStar,
   FaClock,
   FaCheckCircle,
-  FaExclamationCircle
+  FaExclamationCircle,
+  FaPlus
 } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
+
 const ParentHome = ({ user }) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState(null);
+  const [children, setChildren] = useState([]);
+
   useEffect(() => {
       const token = localStorage.getItem('token');
-      
+
       fetch("http://127.0.0.1:8000/api/parent-home", {
+        'method'  : 'GET',
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
@@ -32,16 +38,20 @@ const ParentHome = ({ user }) => {
           }
           return response.json();
         })
-        .then((json) => setData(json))
-        .catch((error) => {
-          console.error("API error:", error);
-          navigate("/login"); // nếu token sai thì đẩy về login
+        .then(data => {
+          setChildren(data.children || []);
+          setData(data); // Set data to bypass loading state
+        })
+        .catch(error => {
+          console.error('Error fetching parent home data:', error);
+          setChildren([]); // Set empty array to show no children
+          setData({}); // Set data to bypass loading state
         });
     }, [navigate]);
-    
+
     if(!data) return <p>Loading...</p>
   // Children data
-  const children = [
+  /*const children = [
     {
       id: 1,
       name: 'Minh Anh',
@@ -64,9 +74,8 @@ const ParentHome = ({ user }) => {
       lastActive: '30 phút trước',
       todayProgress: 100
     }
-  ];
-
-  // Recent achievements
+  ];*/
+  /*// Recent achievements
   const recentAchievements = [
     { id: 1, child: 'Minh Khôi', achievement: 'Hoàn thành chương Phân số', icon: '🏆', time: 'Hôm nay' },
     { id: 2, child: 'Minh Anh', achievement: 'Chuỗi 5 ngày học liên tiếp', icon: '🔥', time: 'Hôm qua' },
@@ -78,7 +87,7 @@ const ParentHome = ({ user }) => {
     { type: 'success', message: 'Minh Khôi đã tiến bộ 25% trong phép chia tuần này' },
     { type: 'warning', message: 'Minh Anh cần luyện tập thêm phần phép nhân 2 chữ số' },
     { type: 'info', message: 'Cả hai con đều duy trì chuỗi học tập tốt!' }
-  ];
+  ];*/
 
   return (
     <div className="min-h-screen px-4 pb-10">
@@ -169,20 +178,34 @@ const ParentHome = ({ user }) => {
                     <p className="text-xs text-gray-400">Ngày liên tiếp</p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-blue-400">23</p>
+                    <p className="text-2xl font-bold text-blue-400">0</p>
                     <p className="text-xs text-gray-400">Bài đã học</p>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
+          <motion.div
+            className="mt-6 flex justify-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Link
+              to="/register"
+              state= {{ role: 'student', parent_email: user?.email }}
+              className="flex items-center gap-2 px-6 py-3 bg-gray-700 rounded-full text-white hover:bg-gray-600 transition-colors font-semibold"
+            >
+              <FaPlus />
+              Đăng kí tài khoản cho con em
+            </Link>
+          </motion.div>
         </motion.section>
-
-        {/* Main Content Grid */}
+          
+        {/* Main Content Grid *
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Insights & Recommendations */}
+          {/* Left Column - Insights & Recommendations *
           <div className="lg:col-span-2 space-y-6">
-            {/* Learning Insights */}
+            {/* Learning Insights 
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -210,9 +233,9 @@ const ParentHome = ({ user }) => {
                   </motion.div>
                 ))}
               </div>
-            </motion.div>
+            </motion.div>*/
 
-            {/* Weekly Progress Chart */}
+            /* Weekly Progress Chart 
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -226,7 +249,7 @@ const ParentHome = ({ user }) => {
                 </button>
               </div>
               
-              {/* Simple progress visualization */}
+              {/* Simple progress visualization 
               <div className="space-y-4">
                 {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day, index) => (
                   <div key={day} className="flex items-center gap-4">
@@ -249,9 +272,9 @@ const ParentHome = ({ user }) => {
             </motion.div>
           </div>
 
-          {/* Right Column - Achievements & Schedule */}
+          {/* Right Column - Achievements & Schedule 
           <div className="space-y-6">
-            {/* Recent Achievements */}
+            {/* Recent Achievements 
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -279,7 +302,7 @@ const ParentHome = ({ user }) => {
               </div>
             </motion.div>
 
-            {/* Study Schedule */}
+            {/* Study Schedule 
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -317,7 +340,7 @@ const ParentHome = ({ user }) => {
               </motion.button>
             </motion.div>
           </div>
-        </div>
+        </div>*/}
       </div>
     </div>
   );

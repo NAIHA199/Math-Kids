@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ParentHomeController;
 //Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -25,7 +26,7 @@ Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum')
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/student-home', [UsersController::class, 'studentHome'])->middleware('role:student');
     Route::get('/teacher-home', [UsersController::class, 'teacherHome'])->middleware('role:teacher');
-    Route::get('/parent-home', [UsersController::class, 'parentHome'])->middleware('role:parent');
+    Route::get('/parent-home', [ParentHomeController::class, 'index'])->middleware('role:parent');
     Route::put('/user/update', [UsersController::class, 'update']);
 });
 

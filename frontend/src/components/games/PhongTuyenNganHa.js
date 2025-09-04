@@ -37,9 +37,9 @@ const WAVES = [
 
 // Function to calculate stars based on waves completed
 const calculateStars = (wavesCompleted) => {
-    if (wavesCompleted >= 2) return 3;
-    if (wavesCompleted >= 1) return 250;
-    return 1;
+    if (wavesCompleted >= 2) return 200;
+    if (wavesCompleted >= 1) return 100;
+    return 50;
 };
 
 // =================================================================================
