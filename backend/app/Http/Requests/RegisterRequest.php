@@ -22,7 +22,7 @@ class RegisterRequest extends FormRequest
 
     public function rules(): array // Nhận role từ front-end, Dựa vào các role trong hàm này để validate
     {
-        return [
+        $rules = [
             'role' => 'required|in:student,teacher,parent', // gán chức vụ khi đăng kí
             'fullName' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
@@ -31,6 +31,11 @@ class RegisterRequest extends FormRequest
 
         ];
 
+        if ($this->input('role') === 'student') {
+            $rules['parent_email'] = 'required|email|max:255|exists:users,email';
+        }
+
+        return $rules;
     }
     public function messages(): array
     {
@@ -41,6 +46,8 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'Email already exists',
             'password.required' => 'Please enter password',
             'password.confirmed' => 'Password confirmation does not match',
+            'parent_email.required' => 'Please enter parent email',
+            'parent_email.exists' => 'Email still not registered.',
         ];
     }
 }

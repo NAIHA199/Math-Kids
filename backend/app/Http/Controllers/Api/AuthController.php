@@ -9,12 +9,14 @@ use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+
 class AuthController extends Controller
 {
-    
+
     // Đăng ký (tạo user mới đưa dữ liệu vào db)
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -25,16 +27,37 @@ class AuthController extends Controller
             'email' => $request->get('email'),
             'username' => $request->get('username'),
             'password' => Hash::make($request->get('password')),
+            'parent_email' => $request->get('parent_email'),
         ]);
 
-        //$token = $user->createToken('api-token')->plainTextToken;
+        // kiểm tra phụ huynh có tồn tại không
+        if ($request->get('role') === 'student') {
+            $parent = User::where('email', $request->get('parent_email'))
+                ->where('role', 'parent')
+                ->first();
 
-        return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user,
-            //'token' => $token,
-            //'token_type' => 'Bearer',
-        ], 201);
+            if (!$parent) {
+                throw ValidationException::withMessages([
+                    'parent_email' => 'Email phụ huynh chưa được đăng ký trong hệ thống.',
+                ]);
+            }
+            // liên kết với phụ huynh
+            $parent->children()->attach($user->id);
+        }
+
+
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json(
+            [
+                'message' => 'User registered successfully',
+                'user' => $user,
+                'token' => $token,
+                'token_type' => 'Bearer',
+            ]
+        );
+
     }
 
     // Đăng nhập, kiểm tra thông tin trả về sanctum token cho front

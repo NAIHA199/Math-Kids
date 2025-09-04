@@ -46,21 +46,21 @@ const RewardPage = () => {
               {
                 id: 1,
                 name: "Tổng số sao",
-                value: data.achievements.stars,
+                value: data.achievements.stars ?? 0,
                 icon: <FaStar />,
                 color: "text-yellow-400"
               },
               {
                 id: 2,
                 name: "Cấp độ",
-                value: data.achievements.level,
+                value: data.achievements.level ?? 0,
                 icon: <FaCrown />,
                 color: "text-purple-400"
               },
               {
                 id: 3,
                 name: "Chuỗi ngày",
-                value: data.achievements.streak_days,
+                value: data.achievements.streak_days ?? 0,
                 icon: <FaCalendarCheck />,
                 color: "text-green-400"
               }
@@ -164,13 +164,13 @@ const RewardPage = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative ${!badge.earned && 'opacity-75'}`}
+                className={`relative ${!badge.is_unlocked && 'opacity-75'}`}
               >
                 <div className={`bg-gradient-to-br ${badge.color} p-6 rounded-2xl shadow-xl text-white text-center backdrop-blur-md border border-gray-700 ${
-                  badge.earned ? 'cursor-pointer hover:shadow-2xl transform hover:scale-105' : ''
+                  badge.is_unlocked ? 'cursor-pointer hover:shadow-2xl transform hover:scale-105' : ''
                 } transition-all`}>
                   
-                  {!badge.earned && (
+                  {!badge.is_unlocked && (
                     <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center">
                       <FaLock className="text-4xl text-white/80" />
                     </div>
@@ -180,9 +180,9 @@ const RewardPage = () => {
                   <h3 className="text-xl font-bold mb-2">{badge.name}</h3>
                   <p className="text-sm opacity-90">{badge.description}</p>
 
-                  {badge.earned ? (
+                  {badge.is_unlocked ? (
                     <p className="text-xs mt-4 opacity-80">
-                      Đạt được: {badge.earnedDate}
+                      Đạt được: {badge.awarded_at}
                     </p>
                   ) : (
                     <p className="text-xs mt-4 font-medium">
@@ -191,7 +191,7 @@ const RewardPage = () => {
                   )}
                 </div>
 
-                {badge.earned && (
+                {badge.is_unlocked && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}

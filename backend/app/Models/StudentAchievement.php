@@ -10,20 +10,21 @@ class StudentAchievement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id',
-        'achievement_id',
+        'user_id',
         'awarded_at',
+        'reward_id',
     ];
 
     // Quan hệ tới User (student)
-    public function student()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'student_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Quan hệ tới Achievement
-    public function achievement()
+
+    // Quan hệ tới Reward
+    public function reward()
     {
-        return $this->belongsTo(Achievement::class, 'achievement_id');
+        return $this->belongsTo(Reward::class, 'reward_id');
     }
 }

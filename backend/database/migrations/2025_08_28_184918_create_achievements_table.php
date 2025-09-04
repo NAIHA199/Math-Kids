@@ -19,16 +19,15 @@ return new class extends Migration {
     Schema::create('student_achievements', function (Blueprint $table) {
       $table->id();
       $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-      $table->foreignId('achievement_id')->constrained('achievements')->cascadeOnDelete(); // lấy id thành tựu mà học sinh đã đạt được
       $table->timestamp('awarded_at');
-      $table->foreignId('reward_id')->constrained('rewards')->cascadeOnDelete();
+      $table->foreignId('reward_id')->nullable()->constrained('rewards')->cascadeOnDelete();
 
       $table->timestamps();
-      $table->unique(['user_id','achievement_id']);
+      $table->unique(['user_id','reward_id']);
     });
   }
   public function down(): void {
     Schema::dropIfExists('student_achievements');
-    Schema::dropIfExists('achievements');
+    Schema::dropIfExists('rewards');
   }
 };

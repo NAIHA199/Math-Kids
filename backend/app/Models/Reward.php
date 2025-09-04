@@ -13,10 +13,12 @@ class Reward extends Model
     protected $fillable = [
         'name', 'category', 'description', 'image_url',
         'field', 'value',
-        'icon', 'color', 'earned', 'requirement', 'earned_date'
     ];
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+    public function studentAchievements() {
+        return $this->hasMany(StudentAchievement::class, 'reward_id');
     }
 }

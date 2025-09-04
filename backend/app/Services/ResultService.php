@@ -8,7 +8,8 @@ use App\Models\Result;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-
+use App\Models\Reward;
+use App\Models\StudentAchievement;
 class ResultService
 {
     /**
@@ -17,6 +18,7 @@ class ResultService
      */
     public function recomputeForUser(int $userId): Result
     {
+
         // Tổng số sao từ tất cả completions (games, lessons, exercises)
         $starsTotal = Completion::where('user_id', $userId)
             ->sum('stars');
@@ -28,11 +30,12 @@ class ResultService
             ->count();
 
         // **Quan trọng:** định nghĩa $level trước khi dùng (để tránh "Undefined variable")
-        $level = intdiv($starsTotal, 100);
+        $level = intdiv($starsTotal, 50);
 
         // Tính streak (logic tạm thời: dựa trên hoạt động không phải game; có thể tùy chỉnh)
         $streak = $this->computeStreak($userId);
 
+        $this->unlockRewards($userId, $starsTotal, $level, $streak, $gamesCompleted);
         // Lưu/update trong transaction
         return DB::transaction(function () use ($userId, $starsTotal, $level, $streak, $gamesCompleted) {
             $result = Result::firstOrNew(['user_id' => $userId]);
@@ -42,6 +45,7 @@ class ResultService
             $result->streak_days = $streak;
             $result->games_completed = $gamesCompleted;
             $result->save();
+
 
             return $result;
         });
@@ -53,6 +57,7 @@ class ResultService
     public function updateProgress(User $user): Result
     {
         return $this->recomputeForUser($user->id);
+
     }
 
     /**
@@ -104,6 +109,66 @@ class ResultService
         return $streak;
     }
 
+
+
+    protected function unlockRewards(
+        int $userId,
+        int $stars,
+        int $level,
+        int $streak,
+        int $gamesCompleted
+    ): void {
+        $rewards = Reward::all();
+
+        foreach ($rewards as $reward) {
+            $requirement = $reward->requirement;
+            $unlock = false;
+
+            // ✅ Parse requirement
+            if (str_starts_with($requirement, 'lesson_completed')) {
+                $target = (int) filter_var($requirement, FILTER_SANITIZE_NUMBER_INT);
+                $unlock = $this->countLessonsCompleted($userId) >= $target;
+            }
+
+            if (str_starts_with($requirement, 'exercises_completed')) {
+                $target = (int) filter_var($requirement, FILTER_SANITIZE_NUMBER_INT);
+                $unlock = $this->countExercisesCompleted($userId) >= $target;
+            }
+
+            if (str_starts_with($requirement, 'stars')) {
+                $target = (int) filter_var($requirement, FILTER_SANITIZE_NUMBER_INT);
+                $unlock = $stars >= $target;
+            }
+
+            if (str_starts_with($requirement, 'level')) {
+                $target = (int) filter_var($requirement, FILTER_SANITIZE_NUMBER_INT);
+                $unlock = $level >= $target;
+            }
+
+            if (str_starts_with($requirement, 'streak_days')) {
+                $target = (int) filter_var($requirement, FILTER_SANITIZE_NUMBER_INT);
+                $unlock = $streak >= $target;
+            }
+
+            if (str_starts_with($requirement, 'games_completed')) {
+                $target = (int) filter_var($requirement, FILTER_SANITIZE_NUMBER_INT);
+                $unlock = $gamesCompleted >= $target;
+            }
+
+            // ✅ Nếu user đạt điều kiện thì gán reward
+            if ($unlock) {
+                StudentReward::firstOrCreate(
+                    [
+                        'student_id' => $userId,
+                        'reward_id' => $reward->id,
+                    ],
+                    [
+                        'awarded_at' => now(),
+                    ]
+                );
+            }
+        }
+    }
     /**
      * Tạo báo cáo đơn giản cho phụ huynh: achievements + recent completions
      */
@@ -125,4 +190,6 @@ class ResultService
             'recent' => $recent,
         ];
     }
+
+
 }

@@ -9,24 +9,14 @@ return new class extends Migration {
     {
         Schema::create('rewards', function (Blueprint $table) {
             $table->id();
-
-            // Tên phần thưởng
             $table->string('name');
-
-            // Nhóm phần thưởng: học tập, thành tích, chuỗi ngày, trò chơi
-            $table->enum('category', ['learning', 'achievement', 'streak', 'games']);
-
-            // Mô tả phần thưởng
+            $table->string('category'); // learning, achievement, streak, games
             $table->text('description')->nullable();
+            $table->string('image_url')->nullable();
 
-            // Điều kiện đạt (ví dụ: "lesson_completed >= 10")
-            $table->string('requirement');
-
-            // Có thể lưu trạng thái đã đạt chưa (nếu muốn caching DB, không chỉ tính toán động)
-            $table->boolean('earned')->default(false);
-
-            // Ngày đạt phần thưởng (nếu có)
-            $table->timestamp('earned_date')->nullable();
+            // điều kiện mở khóa
+            $table->string('field');   // ví dụ: "level", "stars", "games_completed"
+            $table->unsignedInteger('value'); // giá trị yêu cầu
 
             $table->timestamps();
         });

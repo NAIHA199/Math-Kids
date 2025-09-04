@@ -44,13 +44,14 @@ export const useAuth = () => {
     }
   }, []);
 
-  const register = useCallback(async ({ fullName, email, username, password, role, parentEmail }) => {
+  const register = useCallback(async ({ fullName, email, username, password, role, parent_email }) => {
     setIsLoading(true);
     try {
       // Chuẩn bị dữ liệu để gửi
       const registerData = {
         fullName,
         email,
+        parent_email, 
         username,
         password,
         password_confirmation: password,
@@ -58,8 +59,8 @@ export const useAuth = () => {
       };
       
       // Nếu là học sinh, thêm email của phụ huynh
-      if (role === 'student' && parentEmail) {
-        registerData.parentEmail = parentEmail;
+      if (role === 'student' && parent_email) {
+        registerData.parent_email = parent_email;
       }
       
       // Simulate API call

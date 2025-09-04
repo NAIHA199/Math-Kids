@@ -23,7 +23,7 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
     username: '', 
     password: '',
     password_confirmation: '',
-    parentEmail: '' // Thêm trường email phụ huynh cho học sinh
+    parent_email: '' // Thêm trường email phụ huynh cho học sinh
   });
   const [errors, setErrors] = useState({});
   const [fuel, setFuel] = useState(0);
@@ -52,7 +52,7 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
         if (data.email.includes('@')) fuelLevel += 16.67;
         if (data.password.length >= 6) fuelLevel += 16.67;
         if (data.password === data.password_confirmation && data.password.length >= 6) fuelLevel += 16.67;
-        if (data.parentEmail.includes('@')) fuelLevel += 16.67;
+        if (data.parent_email.includes('@')) fuelLevel += 16.67;
       } else {
         // Logic cũ cho giáo viên và phụ huynh
         if (data.fullName.length >= 2) fuelLevel += 20;
@@ -92,8 +92,8 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
       }
       
       // Đối với học sinh, thêm kiểm tra email phụ huynh
-      if (accountType.id === 'student' && !formData.parentEmail) {
-        newErrors.parentEmail = 'Cần email của phụ huynh!';
+      if (accountType.id === 'student' && !formData.parent_email) {
+        newErrors.parent_email = 'Cần email của phụ huynh!';
       }
     }
     
@@ -187,11 +187,11 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
                     <ControlPanel
                       icon={<FaUser />}
                       label="Email của phụ huynh"
-                      name="parentEmail"
+                      name="parent_email"
                       type="email"
-                      value={formData.parentEmail}
-                      onChange={(e) => updateField('parentEmail', e.target.value)}
-                      error={errors.parentEmail}
+                      value={formData.parent_email}
+                      onChange={(e) => updateField('parent_email', e.target.value)}
+                      error={errors.parent_email}
                       placeholder="Email của phụ huynh"
                     />
                   )}

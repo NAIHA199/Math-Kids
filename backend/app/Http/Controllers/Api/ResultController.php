@@ -23,24 +23,13 @@ class ResultController extends Controller
     {
         $user = Auth::user();
 
-        $request->validate([
-            'type' => 'required|string|in:lesson,exercise,game',
 
-        ]);
+        $result = $this->resultService->updateProgress($user);
 
-        $type = $request->input('type');
-        try {
-            //gọi service xử lí
-            $result = $this->resultService->updateProgress($user, $type);
-            return response()->json([
-                'message' => 'Cập nhật tiến trình thành công',
-                'result' => $result
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Lỗi khi cập nhật tiến trình: ' . $e->getMessage()
-            ], 500);
-        }
+        // Check phần thưởng sau khi cập nhật
+        $this->rewardService->checkAndAwardAchievements($user);
+
+        return response()->json($result);
 
     }
 
