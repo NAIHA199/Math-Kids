@@ -6,7 +6,7 @@ use App\Services\RewardService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\ResultService;
-
+use Illuminate\Support\Facades\Auth;
 class RewardController extends Controller
 {
     //Khai báo RewardService
@@ -24,20 +24,21 @@ class RewardController extends Controller
 
     public function summary()
     {
-        $userId = auth()->id();
-        return response()->json($this->rewardService->getSummary($userId));
+        $user = Auth::user();
+        $summary = $this->rewardService->getRewardSummary($user);
+        return response()->json([
+            'achievements' => $summary['achievements'],
+            'badges' => $summary['badges'],
+        ]);
     }
 
     public function index()
     {
-        $rewards = Reward::where('is_active', true)
-            ->orderBy('points_required')
-            ->get();
+        $user = Auth::user();
+        $this->rewardService->checkAndAwardAchievements($user);
+        $summary = $this->rewardService->getRewardSummary($user);
 
-        return response()->json([
-            'success' => true,
-            'data' => $rewards
-        ]);
+        return response()->json($summary);
     }
 
     // Chi tiết reward

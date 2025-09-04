@@ -11,44 +11,7 @@ class RewardService
 {
 
 
-    public function getSummary(int $userId)
-    {
-        // 1. Lấy tổng số sao từ completions
-        $totalStars = Completion::where('user_id', $userId)->sum('stars');
 
-        // 2. Tính level (ví dụ: mỗi 50 sao = 1 level)
-        $level = intdiv($totalStars, 50);
-
-        // 3. Tính streak (ngày liên tiếp)
-        $streak = Completion::where('user_id', $userId)
-            ->where('created_at', '>=', now()->subDays(7))
-            ->distinct('created_at')
-            ->count();
-
-        // 4. Lấy các badges (huy hiệu), luôn hiện tất cả
-        $unlockedRewardIds = StudentAchievement::where('user_id', $userId)
-            ->pluck('reward_id') // hoặc reward_id nếu bạn dùng bảng rewards
-            ->toArray();
-
-        $badges = Reward::all()->map(function ($reward) use ($unlockedRewardIds) {
-            return [
-                'id' => $reward->id,
-                'name' => $reward->name,
-                'description' => $reward->description,
-                'image_url' => $reward->image_url,
-                'is_unlocked' => in_array($reward->id, $unlockedRewardIds),
-            ];
-        });
-
-        return [
-            'achievements' => [
-                'stars' => $totalStars,
-                'level' => $level,
-                'streak_days' => $streak,
-            ],
-            'badges' => $badges,
-        ];
-    }
     /**
      * HÀM QUAN TRỌNG: KIỂM TRA VÀ TRAO PHẦN THƯỞNG
      * Hàm này được gọi bởi ResultService sau khi tiến trình của học sinh được cập nhật.
@@ -56,7 +19,7 @@ class RewardService
     public function checkAndAwardAchievements(User $user): void
     {
         // 1. Lấy thành tích mới nhất của học sinh từ bảng 'results'
-        $progress = Result::where('user_id', $user->id)->first();
+        $progress = Result::where('user_id', $user->id)->latest()->first();
 
         // Nếu học sinh chưa có dòng nào trong bảng results, không làm gì cả
         if (!$progress) {
@@ -65,45 +28,29 @@ class RewardService
 
         // 2. Lấy ID của tất cả các huy hiệu mà học sinh này ĐÃ CÓ
         $existingRewardIds = StudentAchievement::where('user_id', $user->id)
-            ->pluck('reward_id');
+            ->pluck('reward_id')
+            ->toArray();
 
-        // 3. Lấy tất cả các huy hiệu tiềm năng mà học sinh CHƯA CÓ
+        // 3. Lấy tất cả các huy hiệu mà học sinh CHƯA CÓ
         $potentialRewards = Reward::whereNotIn('id', $existingRewardIds)->get();
 
-        // 4. Lặp qua từng huy hiệu tiềm năng để xem học sinh có đủ điều kiện không
+        // 4. Lặp qua từng huy hiệu để xem học sinh có đủ điều kiện không
         foreach ($potentialRewards as $reward) {
-            $isEligible = false;
-
-            // 5. Kiểm tra điều kiện một cách AN TOÀN bằng switch case
-            switch ($reward->type) {
-                case 'STARS':
-                    if ($progress->stars >= $reward->condition_value) {
-                        $isEligible = true;
-                    }
-                    break;
-                case 'LEVEL':
-                    if ($progress->level >= $reward->condition_value) {
-                        $isEligible = true;
-                    }
-                    break;
-                case 'GAMES_COMPLETED':
-                    if ($progress->games_completed >= $reward->condition_value) {
-                        $isEligible = true;
-                    }
-                    break;
-                // Em có thể dễ dàng thêm các loại điều kiện khác ở đây trong tương lai
-                // case 'LESSONS_COMPLETED': ...
-                // case 'STREAK_DAYS': ...
-            }
+        $field = $reward->field;
+        $value = $reward->value;
 
             // 6. Nếu đủ điều kiện, "trao thưởng" bằng cách lưu vào database
-            if ($isEligible) {
-                StudentAchievement::create([
-                    'user_id' => $user->id,
+            if (isset($progress->$field) && $progress->$field >= $value) {
+            StudentAchievement::firstOrCreate(
+                [
+                    'user_id'   => $user->id,
                     'reward_id' => $reward->id,
-                    'unlocked_at' => now(),
-                ]);
-            }
+                ],
+                [
+                    'awarded_at' => now(),
+                ]
+            );
+        }
         }
     }
 
@@ -114,7 +61,12 @@ class RewardService
     public function getRewardSummary(User $user): array
     {
 
-        $progress = Result::firstOrCreate(['user_id' => $user->id]);
+        $progress = Result::where('user_id', $user->id)->latest()->first();
+
+
+        $allRewards = Reward::all();
+
+        $this->checkAndAwardAchievements($user);
 
         $unlockedRewardIds = StudentAchievement::where('user_id', $user->id)
             ->pluck('reward_id')
@@ -127,6 +79,7 @@ class RewardService
                 'description' => $reward->description,
                 'image_url' => $reward->image_url,
                 'is_unlocked' => in_array($reward->id, $unlockedRewardIds),
+
             ];
         });
 

@@ -11,7 +11,8 @@ class Reward extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'category', 'description',
+        'name', 'category', 'description', 'image_url',
+        'field', 'value',
         'icon', 'color', 'earned', 'requirement', 'earned_date'
     ];
 
