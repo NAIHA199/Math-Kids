@@ -24,7 +24,6 @@ const MainLayout = ({ user }) => {
       { path: '/lessons', label: 'Bài học', icon: <FaBook />, color: 'from-blue-500 to-cyan-500' },
       { path: '/games', label: 'Trò chơi', icon: <FaGamepad />, color: 'from-green-500 to-teal-500' },
       { path: '/rewards', label: 'Phần thưởng', icon: <FaTrophy />, color: 'from-yellow-500 to-orange-500' },
-      { path: '/progress', label: 'Tiến độ', icon: <FaChartLine />, color: 'from-red-500 to-pink-500' },
     ],
     teacher: [
       { path: '/teacher-dashboard', label: 'Tổng quan', icon: <FaHome />, color: 'from-purple-500 to-pink-500' },
@@ -36,7 +35,6 @@ const MainLayout = ({ user }) => {
     parent: [
       { path: '/parent-dashboard', label: 'Tổng quan', icon: <FaHome />, color: 'from-purple-500 to-pink-500' },
       { path: '/children', label: 'Con em', icon: <FaUsers />, color: 'from-blue-500 to-cyan-500' },
-      { path: '/progress', label: 'Tiến độ', icon: <FaChartLine />, color: 'from-green-500 to-teal-500' },
       { path: '/rewards', label: 'Thành tích', icon: <FaTrophy />, color: 'from-yellow-500 to-orange-500' },
     ]
   };

@@ -172,10 +172,6 @@ const ParentHome = ({ user }) => {
                     <p className="text-2xl font-bold text-blue-400">23</p>
                     <p className="text-xs text-gray-400">Bài đã học</p>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-green-400">92%</p>
-                    <p className="text-xs text-gray-400">Độ chính xác</p>
-                  </div>
                 </div>
               </motion.div>
             ))}

@@ -67,7 +67,6 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
         { path: '/lessons', label: 'Bài học', icon: <FaBook /> },
         { path: '/games', label: 'Trò chơi', icon: <FaGamepad /> },
         { path: '/rewards', label: 'Phần thưởng', icon: <FaTrophy /> },
-        { path: '/progress', label: 'Tiến độ', icon: <FaChartLine /> },
       ],
       teacher: [
         { path: '/home', label: 'Trang chủ', icon: <FaHome /> },
@@ -79,7 +78,6 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
       parent: [
         { path: '/home', label: 'Trang chủ', icon: <FaHome /> },
         { path: '/children', label: 'Con em', icon: <FaUsers /> },
-        { path: '/progress', label: 'Tiến độ', icon: <FaChartLine /> },
         { path: '/rewards', label: 'Thành tích', icon: <FaTrophy /> },
       ]
     };
@@ -204,15 +202,6 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
                     >
                       <FaUser className="text-gray-400" />
                       <span>Thông tin cá nhân</span>
-                    </Link>
-                    
-                    <Link
-                      to="/settings"
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
-                      onClick={() => setProfileMenuOpen(false)}
-                    >
-                      <FaCog className="text-gray-400" />
-                      <span>Cài đặt</span>
                     </Link>
                     
                     <hr className="border-gray-700" />
