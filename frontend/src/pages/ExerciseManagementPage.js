@@ -16,10 +16,26 @@ const TrashIcon = () => (
   </svg>
 );
 
+// --- Badge trạng thái ---
+const StatusBadge = ({ status }) => {
+  const statusStyles = {
+    completed: { text: "Hoàn thành", classes: "bg-green-500 text-green-100" },
+    "in-progress": { text: "Đang làm", classes: "bg-yellow-500 text-yellow-100" },
+    overdue: { text: "Quá hạn", classes: "bg-red-500 text-red-100" },
+  };
+  const currentStatus = statusStyles[status] || { text: "Không xác định", classes: "bg-gray-500 text-gray-100" };
+  return (
+    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${currentStatus.classes}`}>
+      {currentStatus.text}
+    </span>
+  );
+};
+
 const ExerciseManagementPage = () => {
   const [exercises, setExercises] = useState([]);
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token"); // token lưu trong localStorage
 
+  // --- Load danh sách bài tập ---
   useEffect(() => {
     const fetchExercises = async () => {
       try {
@@ -38,7 +54,10 @@ const ExerciseManagementPage = () => {
     fetchExercises();
   }, [token]);
 
+  // --- Xóa bài tập ---
   const handleDelete = async (exerciseId) => {
+    if (!window.confirm("Bạn có chắc muốn xóa bài tập này không?")) return;
+
     try {
       await fetch(`http://localhost:8000/api/exercises/${exerciseId}`, {
         method: "DELETE",
@@ -53,21 +72,7 @@ const ExerciseManagementPage = () => {
     }
   };
 
-  const StatusBadge = ({ status }) => {
-    const statusStyles = {
-      completed: { text: "Hoàn thành", classes: "bg-green-500 text-green-100" },
-      "in-progress": { text: "Đang làm", classes: "bg-yellow-500 text-yellow-100" },
-      overdue: { text: "Quá hạn", classes: "bg-red-500 text-red-100" },
-    };
-    const currentStatus =
-      statusStyles[status] || { text: "Không xác định", classes: "bg-gray-500 text-gray-100" };
-    return (
-      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${currentStatus.classes}`}>
-        {currentStatus.text}
-      </span>
-    );
-  };
-
+  // --- Render ---
   return (
     <div className="min-h-screen bg-black text-white">
       <SpaceBackground />
@@ -90,7 +95,7 @@ const ExerciseManagementPage = () => {
                 <tbody className="divide-y divide-gray-700">
                   {exercises.map((exercise) => (
                     <tr key={exercise.id} className="hover:bg-gray-700/50 transition duration-150">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{exercise.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{exercise.title}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{exercise.grade?.name || "Chưa có khối"}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{exercise.assigned_date}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -115,9 +120,7 @@ const ExerciseManagementPage = () => {
                   ))}
                   {exercises.length === 0 && (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center text-gray-400">
-                        Chưa có bài tập nào
-                      </td>
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-400">Chưa có bài tập nào</td>
                     </tr>
                   )}
                 </tbody>

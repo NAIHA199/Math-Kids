@@ -1,99 +1,161 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import Question from "../components/exercise/Question";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import AuthenticatedNavbar from "../components/layout/AuthenticatedNavbar";
 import SpaceBackground from "../components/ui/SpaceBackground";
-import { toast } from "react-toastify";
 
-const ExerciseDetailPage = ({ updateTotalStars }) => {
+// Icon SVG
+const FaArrowLeft = () => (
+  <svg viewBox="0 0 448 512" width="1em" height="1em">
+    <path
+      fill="currentColor"
+      d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"
+    ></path>
+  </svg>
+);
+const FaArrowRight = () => (
+  <svg viewBox="0 0 448 512" width="1em" height="1em">
+    <path
+      fill="currentColor"
+      d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"
+    ></path>
+  </svg>
+);
+const FaSpinner = () => (
+  <svg viewBox="0 0 512 512" width="1em" height="1em">
+    <path
+      fill="currentColor"
+      d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
+    ></path>
+  </svg>
+);
+
+// Parse JSON an toàn
+const parseQuestions = (questions) => {
+  try {
+    return typeof questions === "string" ? JSON.parse(questions) : questions;
+  } catch {
+    return [];
+  }
+};
+
+// Component danh sách bài học
+function LessonsList({ lessons, onSelect, currentId }) {
+  return (
+    <div className="w-1/4 p-4 border-r border-gray-700">
+      <h2 className="text-xl font-bold mb-4">Danh sách bài học</h2>
+      <ul>
+        {lessons.map((lesson) => (
+          <li key={lesson.id} className="mb-2">
+            <button
+              onClick={() => onSelect(lesson.id)}
+              className={`block w-full text-left p-2 rounded ${
+                lesson.id === currentId
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              {lesson.title}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default function LessonPageWrapper() {
+  const { lessonId: paramId } = useParams();
   const navigate = useNavigate();
-  const { exerciseId } = useParams();
-  const [questions, setQuestions] = useState([]);
+
+  const [lessons, setLessons] = useState([]);
+  const [lessonId, setLessonId] = useState(paramId || null);
+  const [lessonData, setLessonData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState({});
-  const [showResults, setShowResults] = useState({});
-  const [completed, setCompleted] = useState(false);
+  const [currentSection, setCurrentSection] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
 
-  // Lấy dữ liệu bài tập từ backend
+  // Lấy danh sách bài học
   useEffect(() => {
-    const fetchExercise = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          `http://localhost:8000/api/exercises/${exerciseId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-        const data = await res.json();
-        setQuestions(data.questions || []);
-      } catch (error) {
-        console.error("Lỗi khi load bài tập:", error);
-        toast.error("Lỗi khi tải bài tập!");
-      } finally {
+    fetch("http://127.0.0.1:8000/api/lessons", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLessons(data);
+        if (!lessonId && data.length > 0) {
+          setLessonId(data[0].id);
+          navigate(`/lessons/${data[0].id}`);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, [lessonId, navigate]);
+
+  // Lấy dữ liệu bài học
+  useEffect(() => {
+    if (!lessonId) return;
+    setLoading(true);
+    fetch(`http://127.0.0.1:8000/api/lessons/${lessonId}`)
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setLessonData(data);
+        setCurrentSection(0);
+        setUserAnswers({});
         setLoading(false);
-      }
-    };
-    fetchExercise();
-  }, [exerciseId]);
+      })
+      .catch((err) => {
+        console.error("Lỗi fetch dữ liệu:", err);
+        toast.error("Không tải được dữ liệu bài học!");
+        setLoading(false);
+      });
+  }, [lessonId]);
 
-  // Chọn đáp án
-  const handleAnswerSelect = (optionIndex) => {
-    setSelectedOptions({
-      ...selectedOptions,
-      [currentQuestionIndex]: optionIndex,
-    });
+  const handleSelectLesson = (id) => {
+    setLessonId(id);
+    navigate(`/lessons/${id}`);
   };
 
-  // Xem kết quả từng câu
-  const handleAnswer = (result) => {
-    setShowResults({
-      ...showResults,
-      [currentQuestionIndex]: result,
-    });
+  const handleAnswer = (qIndex, optIndex) => {
+    setUserAnswers((prev) => ({ ...prev, [qIndex]: optIndex }));
   };
 
-  // Câu tiếp theo
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
-
-  // Câu trước
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  // Hoàn thành bài tập
   const handleComplete = async () => {
-    const updatedResults = {};
-    questions.forEach((q, i) => {
-      const userAnswer = selectedOptions[i];
-      updatedResults[i] = {
-        isCorrect: userAnswer === q.correctAnswer,
-        correctAnswer: q.correctAnswer,
-      };
-    });
-    setShowResults(updatedResults);
-    setCompleted(true);
-
-    const totalQ = questions.length;
-    const correctQ = Object.values(updatedResults).filter(
-      (r) => r.isCorrect
-    ).length;
-    const progressPercent = 100;
-    const scorePercent = Math.round((correctQ / totalQ) * 100);
-    const stars = scorePercent >= 90 ? 1 : 0;
-
+    const sections = lessonData.sections || [];
     try {
+      const progressPercent = Math.round(
+        ((currentSection + 1) / sections.length) * 100
+      );
+
+      let scorePercent = null;
+      if (sections.some((sec) => sec.type === "practice")) {
+        const practiceSections = sections.filter((sec) => sec.type === "practice");
+        let totalQ = 0,
+          correctQ = 0;
+        practiceSections.forEach((sec) => {
+          const questions = parseQuestions(sec.questions);
+          questions.forEach((q, i) => {
+            totalQ++;
+            if (userAnswers[i] === q.correct) correctQ++;
+          });
+        });
+        if (totalQ > 0) scorePercent = Math.round((correctQ / totalQ) * 100);
+      }
+
+      let stars = 0;
+      if (progressPercent === 100) {
+        const value = scorePercent ?? progressPercent;
+        if (value === 100) stars = 1;
+        else stars = 0;
+      }
+
       await fetch("http://localhost:8000/api/completions/upsert", {
         method: "POST",
         headers: {
@@ -101,182 +163,157 @@ const ExerciseDetailPage = ({ updateTotalStars }) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          completable_type: "exercise",
-          completable_id: exerciseId,
+          completable_type: "lesson",
+          completable_id: lessonId,
           progress: progressPercent,
           score: scorePercent,
           status: "completed",
           stars: stars,
         }),
       });
-      toast.success(`🎉 Hoàn thành bài tập! Bạn đạt ${stars} ⭐`);
 
-      // Cập nhật tổng sao
-      try {
-        const resStars = await fetch(
-          "http://localhost:8000/api/users/me/progress",
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
-        );
-        const dataStars = await resStars.json();
-        updateTotalStars(dataStars.totalStars);
-      } catch (error) {
-        console.error("Lỗi khi cập nhật tổng sao:", error);
-      }
+      toast.success(`🎉 Hoàn thành bài học! Bạn đạt ${stars} ⭐`);
+      navigate("/student-home");
     } catch {
       toast.error("Lỗi khi lưu tiến trình!");
     }
   };
 
-  const handleExit = () => {
-    navigate("/exercises");
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <SpaceBackground />
+        <div className="relative z-10 text-center">
+          <FaSpinner className="animate-spin text-4xl mb-4" />
+          <p>Đang tải bài học...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Tính % progress
-  const progressPercent =
-    questions.length > 0
-      ? Math.round(((currentQuestionIndex + 1) / questions.length) * 100)
-      : 0;
+  if (!lessonData) return <p>Không có dữ liệu bài học</p>;
+
+  const sections = lessonData.sections || [];
+  const section = sections[currentSection] || {};
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <SpaceBackground />
-      <AuthenticatedNavbar />
-      <div className="relative z-10 pt-24 px-4 pb-8">
+    <div className="min-h-screen bg-black text-white flex">
+      <LessonsList
+        lessons={lessons}
+        onSelect={handleSelectLesson}
+        currentId={lessonId}
+      />
+
+      <div className="flex-1 relative z-10 pt-20 px-4 sm:px-6 lg:px-8 pb-12">
+        <AuthenticatedNavbar
+          onLogout={() => {
+            localStorage.removeItem("user");
+            navigate("/login");
+          }}
+        />
+
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Bài tập Toán
-            </h1>
+          <div className="mb-8 text-center">
             <button
-              onClick={handleExit}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center gap-2"
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 transition-colors"
             >
-              <span>Thoát</span>
+              <FaArrowLeft className="mr-2" /> Quay lại
             </button>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {lessonData.title}
+            </h1>
+            <p className="text-gray-400">{lessonData.description}</p>
           </div>
 
-          {/* Hiển thị tiến trình */}
-          <div className="mb-4 text-center text-gray-300">
-            Câu {currentQuestionIndex + 1}/{questions.length} (
-            {progressPercent}%)
-          </div>
+          {/* Section Content */}
+          <div className="bg-gray-900 p-6 rounded-2xl shadow-lg mb-6">
+            <h2 className="text-2xl font-semibold mb-4">{section.title}</h2>
 
-          {!loading && questions[currentQuestionIndex] && (
-            <div className="mb-8">
-              <Question
-                question={questions[currentQuestionIndex]}
-                currentQuestion={currentQuestionIndex + 1}
-                totalQuestions={questions.length}
-                selectedOption={selectedOptions[currentQuestionIndex]}
-                showResult={showResults[currentQuestionIndex]}
-                onSelectOption={handleAnswerSelect}
-                onAnswer={handleAnswer}
-              />
-            </div>
-          )}
+            {section.type === "intro" && section.content && (
+              <p className="text-gray-300">{section.content}</p>
+            )}
 
-          {/* Nếu đã hoàn thành thì hiện kết quả chi tiết */}
-          {completed && (
-            <div className="mb-8 bg-gray-800/50 rounded-xl p-6 border border-purple-500/30">
-              <h3 className="text-xl font-bold mb-4 text-center">
-                Kết quả chi tiết
-              </h3>
-              <div className="space-y-4">
-                {questions.map((question, index) => {
-                  const result = showResults[index];
-                  const userAnswer = selectedOptions[index];
-                  return (
-                    <div key={index} className="p-4 rounded-lg border">
-                      <p className="font-medium mb-2">
-                        Câu {index + 1}: {question.question}
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-                        {(question?.options || []).map((option, optIndex) => {
-                          let optionStyle = "p-2 rounded text-sm ";
-                          if (optIndex === question.correctAnswer) {
-                            optionStyle +=
-                              "bg-green-900/30 border border-green-500";
-                          } else if (
-                            optIndex === userAnswer &&
-                            !result?.isCorrect
-                          ) {
-                            optionStyle +=
-                              "bg-red-900/30 border border-red-500";
-                          } else {
-                            optionStyle += "bg-gray-700/50";
-                          }
-                          return (
-                            <div key={optIndex} className={optionStyle}>
-                              <span className="font-medium">
-                                {String.fromCharCode(65 + optIndex)}.
-                              </span>{" "}
-                              {option}
-                              {optIndex === question.correctAnswer && (
-                                <span className="ml-2 text-green-400">
-                                  ✓ Đáp án đúng
-                                </span>
-                              )}
-                              {optIndex === userAnswer &&
-                                optIndex !== question.correctAnswer && (
-                                  <span className="ml-2 text-red-400">
-                                    ✗ Bạn chọn
-                                  </span>
-                                )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div
-                        className={`font-medium ${
-                          result?.isCorrect ? "text-green-400" : "text-red-400"
+            {section.type === "video" && section.video_url && (
+              <div className="aspect-w-16 aspect-h-9">
+                <iframe
+                  src={section.video_url}
+                  title="Bài giảng"
+                  className="w-full h-96 rounded-lg"
+                  frameBorder="0"
+                  allowFullScreen
+                />
+              </div>
+            )}
+
+            {section.type === "practice" && (
+              <div>
+                {parseQuestions(section.questions).map((q, i) => (
+                  <div key={i} className="mb-4">
+                    <p className="font-medium mb-2">{q.question}</p>
+                    {q.options.map((opt, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleAnswer(i, idx)}
+                        className={`block w-full text-left p-2 rounded mb-1 ${
+                          userAnswers[i] === idx
+                            ? "bg-blue-600"
+                            : "bg-gray-700 hover:bg-gray-600"
                         }`}
                       >
-                        {result?.isCorrect
-                          ? "✅ Trả lời đúng!"
-                          : "❌ Trả lời sai!"}
-                      </div>
-                    </div>
-                  );
-                })}
+                        {opt}
+                      </button>
+                    ))}
+                    {userAnswers[i] !== undefined && (
+                      <p
+                        className={`mt-1 text-sm ${
+                          userAnswers[i] === q.correct
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {userAnswers[i] === q.correct
+                          ? "Đúng!"
+                          : `Sai! Đáp án đúng: ${q.options[q.correct]}`}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Điều hướng câu hỏi */}
-          <div className="flex justify-between">
+            {section.type === "summary" && section.content && (
+              <p className="text-gray-300">{section.content}</p>
+            )}
+          </div>
+
+          {/* Navigation */}
+          <div className="flex justify-between mt-6">
             <button
-              onClick={handlePreviousQuestion}
-              disabled={currentQuestionIndex === 0 || completed}
-              className="px-6 py-3 bg-blue-600 rounded-lg disabled:opacity-50 hover:bg-blue-700 transition-colors flex items-center gap-2"
+              onClick={() => setCurrentSection((prev) => Math.max(prev - 1, 0))}
+              disabled={currentSection === 0}
+              className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 disabled:opacity-50"
             >
-              <span>Câu trước</span>
+              <FaArrowLeft /> Trước
             </button>
 
-            {!completed ? (
-              currentQuestionIndex < questions.length - 1 ? (
-                <button
-                  onClick={handleNextQuestion}
-                  disabled={selectedOptions[currentQuestionIndex] === undefined}
-                  className="px-6 py-3 bg-green-600 rounded-lg disabled:opacity-50 hover:bg-green-700 transition-colors flex items-center gap-2"
-                >
-                  <span>Câu tiếp theo</span>
-                </button>
-              ) : (
-                <button
-                  onClick={handleComplete}
-                  className="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <span>Hoàn thành</span>
-                </button>
-              )
+            {currentSection < sections.length - 1 ? (
+              <button
+                onClick={() =>
+                  setCurrentSection((prev) =>
+                    Math.min(prev + 1, sections.length - 1)
+                  )
+                }
+                className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500"
+              >
+                Tiếp <FaArrowRight />
+              </button>
             ) : (
               <button
-                onClick={() => navigate("/exercises")}
-                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all flex items-center gap-2"
+                onClick={handleComplete}
+                className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-500"
               >
-                <span>Quay về danh sách</span>
+                Hoàn thành
               </button>
             )}
           </div>
@@ -284,6 +321,4 @@ const ExerciseDetailPage = ({ updateTotalStars }) => {
       </div>
     </div>
   );
-};
-
-export default ExerciseDetailPage;
+}
