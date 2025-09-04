@@ -65,6 +65,7 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
       student: [
         { path: '/home', label: 'Trang chủ', icon: <FaHome /> },
         { path: '/lessons', label: 'Bài học', icon: <FaBook /> },
+        { path: '/exercises', label: 'Bài tập', icon: <FaClipboardList /> },
         { path: '/games', label: 'Trò chơi', icon: <FaGamepad /> },
         { path: '/rewards', label: 'Phần thưởng', icon: <FaTrophy /> },
       ],

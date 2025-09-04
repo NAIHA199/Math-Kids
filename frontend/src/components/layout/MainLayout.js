@@ -22,6 +22,7 @@ const MainLayout = ({ user }) => {
     student: [
       { path: '/student-dashboard', label: 'Trang chủ', icon: <FaHome />, color: 'from-purple-500 to-pink-500' },
       { path: '/lessons', label: 'Bài học', icon: <FaBook />, color: 'from-blue-500 to-cyan-500' },
+      { path: '/exercises', label: 'Bài tập', icon: <FaClipboardList />, color: 'from-indigo-500 to-purple-500' },
       { path: '/games', label: 'Trò chơi', icon: <FaGamepad />, color: 'from-green-500 to-teal-500' },
       { path: '/rewards', label: 'Phần thưởng', icon: <FaTrophy />, color: 'from-yellow-500 to-orange-500' },
     ],

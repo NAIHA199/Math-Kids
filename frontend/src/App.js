@@ -12,6 +12,7 @@ import LessonPage from './pages/LessonPage';
 import GamePage from './pages/GamePage';
 import RewardPage from './pages/RewardPage';
 import ExercisePage from './pages/ExercisePage';
+import ExerciseDetailPage from './pages/ExerciseDetailPage';
 import StudentManagementPage from './pages/StudentManagementPage';
 import ClassManagementPage from './pages/ClassManagementPage';
 import AssignmentManagementPage from './pages/AssignmentManagementPage';
@@ -190,6 +191,12 @@ function App() {
           <Route path="/exercises" element={
             <ProtectedRoute allowedRoles={['student']}>
               <ExercisePage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/exercises/:exerciseId" element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <ExerciseDetailPage />
             </ProtectedRoute>
           } />
           
