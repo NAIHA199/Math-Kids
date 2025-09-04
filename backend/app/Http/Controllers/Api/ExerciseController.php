@@ -5,58 +5,99 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ExerciseController extends Controller
 {
-    // Lấy danh sách bài tập cho 1 bài học
-    public function index($lessonId)
+    // Lấy danh sách tất cả bài tập
+    public function index()
     {
-        return Exercise::where('lesson_id', $lessonId)->with('images')->get();
+        $user = Auth::user(); // user hiện tại
+        $exercises = Exercise::with('completions')->get();
+
+        $data = $exercises->map(function ($exercise) use ($user) {
+            $completion = $exercise->completions()->where('user_id', $user->id)->first();
+            return [
+                'id' => $exercise->id,
+                'title' => $exercise->title,
+                'lesson_id' => $exercise->lesson_id,
+                'type' => $exercise->type,
+                'description' => $exercise->description,
+                'questions' => $exercise->questions,
+                'completed' => $completion ? true : false,
+                'score' => $completion ? $completion->score : null,
+                'difficulty' => $exercise->difficulty ?? null,
+                'time' => $exercise->time ?? null,
+                'category' => $exercise->type, // dùng type làm category
+            ];
+        });
+
+        return response()->json($data);
     }
 
-    // Lấy 1 bài tập kèm ảnh
-    public function show($id)
+    // Lấy chi tiết 1 bài tập
+    public function show(Exercise $exercise)
     {
-        return Exercise::with('images')->findOrFail($id);
+        $user = Auth::user();
+        $completion = $exercise->completions()->where('user_id', $user->id)->first();
+
+        $data = [
+            'id' => $exercise->id,
+            'title' => $exercise->title,
+            'lesson_id' => $exercise->lesson_id,
+            'type' => $exercise->type,
+            'description' => $exercise->description,
+            'questions' => $exercise->questions,
+            'completed' => $completion ? true : false,
+            'score' => $completion ? $completion->score : null,
+            'difficulty' => $exercise->difficulty ?? null,
+            'time' => $exercise->time ?? null,
+            'category' => $exercise->type,
+        ];
+
+        return response()->json($data);
     }
 
     // Tạo bài tập mới
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
             'lesson_id' => 'required|exists:lessons,id',
-            'title' => 'required|string',
             'type' => 'required|string',
             'description' => 'nullable|string',
-            'questions' => 'nullable|json',
+            'questions' => 'required|array',
+            'difficulty' => 'nullable|string',
+            'time' => 'nullable|string',
         ]);
 
-        $exercise = Exercise::create($data);
-        return response()->json(['message' => 'Exercise created', 'exercise' => $exercise], 201);
+        $exercise = Exercise::create($validated);
+
+        return response()->json($exercise, 201);
     }
 
     // Cập nhật bài tập
-    public function update(Request $request, $id)
+    public function update(Request $request, Exercise $exercise)
     {
-        $exercise = Exercise::findOrFail($id);
-
-        $data = $request->validate([
-            'title' => 'sometimes|string',
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'lesson_id' => 'sometimes|exists:lessons,id',
             'type' => 'sometimes|string',
             'description' => 'nullable|string',
-            'questions' => 'nullable|json',
+            'questions' => 'sometimes|array',
+            'difficulty' => 'sometimes|string',
+            'time' => 'sometimes|string',
         ]);
 
-        $exercise->update($data);
-        return response()->json(['message' => 'Exercise updated', 'exercise' => $exercise], 200);
+        $exercise->update($validated);
+
+        return response()->json($exercise);
     }
 
     // Xóa bài tập
-    public function destroy($id)
+    public function destroy(Exercise $exercise)
     {
-        $exercise = Exercise::findOrFail($id);
         $exercise->delete();
-
-        return response()->json(['message' => 'Exercise deleted'], 200);
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }

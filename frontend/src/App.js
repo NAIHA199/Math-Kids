@@ -12,10 +12,9 @@ import LessonPage from './pages/LessonPage';
 import GamePage from './pages/GamePage';
 import RewardPage from './pages/RewardPage';
 import ExercisePage from './pages/ExercisePage';
-import ExerciseDetailPage from './pages/ExerciseDetailPage';
 import StudentManagementPage from './pages/StudentManagementPage';
 import ClassManagementPage from './pages/ClassManagementPage';
-import AssignmentManagementPage from './pages/AssignmentManagementPage';
+import ExerciseManagementPage from './pages/ExerciseManagementPage'; // ✅ đổi ở đây
 import Children from './pages/ChildrenManagementPage';
 
 import { getCurrentUser } from './utils/helpers';
@@ -30,6 +29,9 @@ import AdminLessonPage from './pages/AdminLessonPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 
+// Import ExerciseDetailPage
+import ExerciseDetailPage from './pages/ExerciseDetailPage';
+
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = getCurrentUser();
@@ -37,9 +39,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
   
-  // If allowedRoles is specified, check if user's role is included
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // Redirect to their own dashboard
     switch(user.role) {
       case 'student':
         return <Navigate to="/student-home" replace />;
@@ -55,11 +55,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
-// Public Route Component (redirect if already logged in)
+// Public Route Component
 const PublicRoute = ({ children }) => {
   const user = getCurrentUser();
   if (user) {
-    // Redirect to role-specific dashboard
     switch(user.role) {
       case 'student':
         return <Navigate to="/student-home" replace />;
@@ -106,7 +105,7 @@ function App() {
             </PublicRoute>
           } />
           
-          {/* Protected routes - Role-specific homes */}
+          {/* Role-specific homes */}
           <Route path="/student-home" element={
             <ProtectedRoute allowedRoles={['student']}>
               <AuthenticatedHomePage />
@@ -125,27 +124,26 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Profile route */}
+          {/* Profile */}
           <Route path="/profile" element={
             <ProtectedRoute>
               <ProfilePage />
             </ProtectedRoute>
           } />
           
-          {/* Settings route */}
+          {/* Settings */}
           <Route path="/settings" element={
             <ProtectedRoute>
               <SettingsPage />
             </ProtectedRoute>
           } />
           
-          {/* Legacy dashboard redirects */}
+          {/* Legacy redirects */}
           <Route path="/dashboard" element={<Navigate to="/home" replace />} />
           <Route path="/student-dashboard" element={<Navigate to="/student-home" replace />} />
           <Route path="/teacher-dashboard" element={<Navigate to="/teacher-home" replace />} />
           <Route path="/parent-dashboard" element={<Navigate to="/parent-home" replace />} />
           
-          {/* Fallback for old /home route - redirect to role-specific home */}
           <Route path="/home" element={
             <ProtectedRoute>
               {(() => {
@@ -174,8 +172,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/lessons/:lessonId" element={<LessonPage />} />
-
           <Route path="/games" element={
             <ProtectedRoute allowedRoles={['student']}>
               <GamePage />
@@ -193,7 +189,8 @@ function App() {
               <ExercisePage />
             </ProtectedRoute>
           } />
-          
+
+          {/* Mới: route chi tiết bài tập */}
           <Route path="/exercises/:exerciseId" element={
             <ProtectedRoute allowedRoles={['student']}>
               <ExerciseDetailPage />
@@ -207,9 +204,9 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/assignments" element={
+          <Route path="/exercises-management" element={ // ✅ đổi từ assignments
             <ProtectedRoute allowedRoles={['teacher']}>
-              <AssignmentManagementPage />
+              <ExerciseManagementPage />
             </ProtectedRoute>
           } />
           
@@ -232,14 +229,14 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* New Admin route */}
+          {/* Admin */}
           <Route path="/admin/lessons" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminLessonPage />
             </ProtectedRoute>
           } />
 
-          {/* Fallback route */}
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         

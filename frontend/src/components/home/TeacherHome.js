@@ -11,8 +11,7 @@ import {
   FaCheckCircle,
   FaClock
 } from 'react-icons/fa';
-import { useEffect, useState} from 'react';
-
+import { useEffect, useState } from 'react';
 
 const TeacherHome = ({ user }) => {
   const navigate = useNavigate();
@@ -46,7 +45,7 @@ const TeacherHome = ({ user }) => {
   const stats = {
     totalStudents: 45,
     activeClasses: 3,
-    pendingAssignments: 12,
+    pendingExercises: 12,
     completionRate: 78
   };
 
@@ -117,7 +116,7 @@ const TeacherHome = ({ user }) => {
               className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-md rounded-2xl p-6 border border-yellow-500/30"
             >
               <FaClipboardList className="text-3xl text-yellow-400 mb-2" />
-              <p className="text-3xl font-bold text-yellow-400">{stats.pendingAssignments}</p>
+              <p className="text-3xl font-bold text-yellow-400">{stats.pendingExercises}</p>
               <p className="text-sm text-gray-400">Bài tập chờ chấm</p>
             </motion.div>
 
@@ -181,7 +180,7 @@ const TeacherHome = ({ user }) => {
                         whileTap={{ scale: 0.95 }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate('/assignments');
+                          navigate('/exercises-management'); // ✅ dẫn đến ExerciseManagementPage
                         }}
                       >
                         Giao bài tập
@@ -242,7 +241,7 @@ const TeacherHome = ({ user }) => {
                   className="w-full py-3 bg-purple-500/20 text-purple-400 rounded-xl hover:bg-purple-500/30 transition-colors font-medium"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate('/assignments')}
+                  onClick={() => navigate('/exercises-management')} // ✅ dẫn đến ExerciseManagementPage
                 >
                   Tạo bài tập mới
                 </motion.button>

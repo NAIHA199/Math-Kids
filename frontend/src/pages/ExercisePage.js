@@ -1,88 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaBook, FaClipboardList, FaStar, FaClock } from 'react-icons/fa';
+import { FaClipboardList, FaClock, FaStar } from 'react-icons/fa';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 import SpaceBackground from '../components/ui/SpaceBackground';
+import { toast } from 'react-toastify';
 
 const ExercisePage = () => {
   const navigate = useNavigate();
+  const [exercises, setExercises] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  
-  // Mock data for exercises
-  const exercises = [
-    {
-      id: 1,
-      title: "Phép cộng có nhớ",
-      description: "Luyện tập các phép cộng có nhớ trong phạm vi 100",
-      difficulty: "Dễ",
-      questions: 10,
-      time: "15 phút",
-      completed: true,
-      score: 90,
-      category: "toan"
-    },
-    {
-      id: 2,
-      title: "Phép trừ có nhớ",
-      description: "Luyện tập các phép trừ có nhớ trong phạm vi 100",
-      difficulty: "Dễ",
-      questions: 10,
-      time: "15 phút",
-      completed: false,
-      category: "toan"
-    },
-    {
-      id: 3,
-      title: "Bảng cửu chương",
-      description: "Ôn tập bảng cửu chương từ 2 đến 9",
-      difficulty: "Trung bình",
-      questions: 20,
-      time: "20 phút",
-      completed: false,
-      category: "toan"
-    },
-    {
-      id: 4,
-      title: "Phân số cơ bản",
-      description: "Giới thiệu về phân số và các phép toán cơ bản",
-      difficulty: "Trung bình",
-      questions: 15,
-      time: "25 phút",
-      completed: false,
-      category: "toan"
-    },
-    {
-      id: 5,
-      title: "Hình học cơ bản",
-      description: "Nhận biết các hình học cơ bản và tính chất",
-      difficulty: "Khó",
-      questions: 12,
-      time: "30 phút",
-      completed: false,
-      category: "toan"
-    },
-    {
-      id: 6,
-      title: "Toán logic",
-      description: "Giải các bài toán logic và tư duy",
-      difficulty: "Khó",
-      questions: 8,
-      time: "35 phút",
-      completed: false,
-      category: "logic"
-    }
-  ];
 
   const categories = [
     { id: 'all', name: 'Tất cả' },
     { id: 'toan', name: 'Toán học' },
-    { id: 'logic', name: 'Tư duy logic' }
+    { id: 'logic', name: 'Tư duy logic' },
   ];
 
-  const filteredExercises = selectedCategory === 'all' 
-    ? exercises 
-    : exercises.filter(exercise => exercise.category === selectedCategory);
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:8000/api/exercises', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setExercises(data);
+      } catch (error) {
+        console.error('Lỗi khi load bài tập:', error);
+        toast.error("Lỗi khi load bài tập!");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExercises();
+  }, []);
 
   const handleStartExercise = (exerciseId) => {
     navigate(`/exercises/${exerciseId}`);
@@ -90,18 +52,27 @@ const ExercisePage = () => {
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'Dễ': return 'text-green-400';
-      case 'Trung bình': return 'text-yellow-400';
-      case 'Khó': return 'text-red-400';
-      default: return 'text-gray-400';
+      case 'Dễ':
+        return 'text-green-400';
+      case 'Trung bình':
+        return 'text-yellow-400';
+      case 'Khó':
+        return 'text-red-400';
+      default:
+        return 'text-gray-400';
     }
   };
+
+  const filteredExercises =
+    selectedCategory === 'all'
+      ? exercises
+      : exercises.filter((e) => e.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-black text-white">
       <SpaceBackground />
       <AuthenticatedNavbar />
-      
+
       <div className="relative z-10 pt-20 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -111,7 +82,9 @@ const ExercisePage = () => {
             className="text-center mb-8"
           >
             <h1 className="text-3xl font-bold mb-2">Bài tập</h1>
-            <p className="text-gray-400">Luyện tập các bài tập để củng cố kiến thức</p>
+            <p className="text-gray-400">
+              Luyện tập các bài tập để củng cố kiến thức
+            </p>
           </motion.div>
 
           {/* Category Filter */}
@@ -131,6 +104,16 @@ const ExercisePage = () => {
             ))}
           </div>
 
+          {/* Loading */}
+          {loading && (
+            <p className="text-center text-gray-400">Đang tải bài tập...</p>
+          )}
+
+          {/* No exercises */}
+          {!loading && filteredExercises.length === 0 && (
+            <p className="text-center text-gray-400">Chưa có bài tập nào</p>
+          )}
+
           {/* Exercises Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredExercises.map((exercise, index) => (
@@ -144,7 +127,9 @@ const ExercisePage = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold mb-2">{exercise.title}</h3>
-                    <p className="text-gray-400 text-sm">{exercise.description}</p>
+                    <p className="text-gray-400 text-sm">
+                      {exercise.description}
+                    </p>
                   </div>
                   {exercise.completed && (
                     <div className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
@@ -156,19 +141,23 @@ const ExercisePage = () => {
                 <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
                   <div className="flex items-center gap-1">
                     <FaClipboardList />
-                    <span>{exercise.questions} câu hỏi</span>
+                    <span>{exercise.questions?.length || 0} câu hỏi</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <FaClock />
-                    <span>{exercise.time}</span>
+                    <span>{exercise.time || '—'}</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center mb-4">
-                  <span className={`text-sm font-medium ${getDifficultyColor(exercise.difficulty)}`}>
-                    {exercise.difficulty}
+                  <span
+                    className={`text-sm font-medium ${getDifficultyColor(
+                      exercise.difficulty
+                    )}`}
+                  >
+                    {exercise.difficulty || 'Không xác định'}
                   </span>
-                  {exercise.completed && (
+                  {exercise.completed && exercise.score && (
                     <div className="flex items-center gap-1 text-yellow-400">
                       <FaStar />
                       <span className="font-bold">{exercise.score}/100</span>

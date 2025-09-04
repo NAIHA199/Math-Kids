@@ -72,7 +72,7 @@ const AuthenticatedNavbar = ({ user: propUser }) => {
       teacher: [
         { path: '/home', label: 'Trang chủ', icon: <FaHome /> },
         { path: '/classes', label: 'Lớp học', icon: <FaUsers /> },
-        { path: '/assignments', label: 'Bài tập', icon: <FaClipboardList /> },
+        { path: '/exercises-management', label: 'Bài tập', icon: <FaClipboardList /> },
         { path: '/students', label: 'Học sinh', icon: <FaUsers /> },
         { path: '/reports', label: 'Báo cáo', icon: <FaChartLine /> },
       ],

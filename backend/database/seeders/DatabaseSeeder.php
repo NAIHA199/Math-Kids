@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
         User::factory(5)->create();
 
         $this->call([
-            //LessonSeeder::class,
-            //SectionSeeder::class,
-            //ExerciseSeeder::class,
+            LessonSeeder::class,
+            SectionSeeder::class,
+            ExerciseSeeder::class,
             ImageSeeder::class,
             CompletionSeeder::class,
             RewardSeeder::class,

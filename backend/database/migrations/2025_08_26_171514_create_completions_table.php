@@ -9,7 +9,8 @@ return new class extends Migration {
     {
         Schema::create('completions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // người học
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
 
             // Polymorphic: áp dụng cho cả Lesson và Exercise
             $table->morphs('completable'); // completable_id, completable_type

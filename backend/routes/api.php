@@ -42,10 +42,14 @@ Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);  /
 Route::get('/lessons/{lessonId}/sections', [LessonController::class, 'getLessonWithSections']);
 
 
-//Route bài tập
-Route::get('/exercises', [ExerciseController::class, 'index']);
-Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
 
+//Route bài tập
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/exercises', [ExerciseController::class, 'index']);
+    Route::post('/exercises', [ExerciseController::class, 'store']);
+    Route::get('/exercises/{exercise}', [ExerciseController::class, 'show']);
+    Route::put('/exercises/{exercise}', [ExerciseController::class, 'update']);
+    Route::delete('/exercises/{exercise}', [ExerciseController::class, 'destroy']);});
 //Route game
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/games', [GameController::class, 'index']);
@@ -74,3 +78,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/results/update', [ResultController::class, 'updateProgress']); // Cập nhật khi hs làm xong bài học/bài tập thì tăng sao, level
     Route::get('/results/{user}', [ResultController::class, 'show']); // Trả báo cáo cho ph/gv
 });
+

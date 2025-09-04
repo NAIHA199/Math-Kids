@@ -16,9 +16,9 @@ public function up()
         $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
         $table->string('title');
         $table->string('type');
-        $table->text('description')->nullable();
-        $table->json('questions')->nullable();
-        $table->timestamps();
+        $table->text('description')->nullable();//  mô tả bài tập
+        $table->json('questions')->nullable();//    lưu mảng câu hỏi dưới dạng JSON
+        $table->timestamps();// created_at, updated_at
     });
     }
 
