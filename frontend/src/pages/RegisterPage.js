@@ -13,7 +13,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register, isLoading } = useAuth();
+  const { register, login, isLoading } = useAuth();
   
   // States
   const [currentStep, setCurrentStep] = useState('accountType');
@@ -34,13 +34,38 @@ const RegisterPage = () => {
         role: selectedAccountType.id
       });
       
+      toast.success('🎉 Đăng ký thành công!');
       
-      toast.success('🎉 Đăng ký thành công! Vui lòng đăng nhập để tiếp tục!');
+      // Tự động đăng nhập sau khi đăng ký thành công
+      const loginResult = await login({
+        username: data.username,
+        password: data.password,
+        role: selectedAccountType.id
+      });
       
-      // Redirect to login after success
-      setTimeout(() => {
-        navigate('/login'); // ✅ Chuyển về login thay vì dashboard
-      }, 2000);
+      if (loginResult.success) {
+        // Redirect to appropriate dashboard based on role
+        setTimeout(() => {
+          switch(selectedAccountType.id) {
+            case 'student':
+              navigate('/student-home');
+              break;
+            case 'teacher':
+              navigate('/teacher-home');
+              break;
+            case 'parent':
+              navigate('/parent-home');
+              break;
+            default:
+              navigate('/home');
+          }
+        }, 2000);
+      } else {
+        // If auto-login fails, redirect to login page
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
     } catch (error) {
       setCurrentStep('registerForm');
       toast.error('🚀 Đăng ký thất bại! Vui lòng thử lại!');

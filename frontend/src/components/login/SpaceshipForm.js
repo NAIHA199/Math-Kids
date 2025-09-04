@@ -23,6 +23,7 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
     username: '', 
     password: '',
     password_confirmation: '',
+    parentEmail: '' // Thêm trường email phụ huynh cho học sinh
   });
   const [errors, setErrors] = useState({});
   const [fuel, setFuel] = useState(0);
@@ -44,15 +45,26 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
       if (data.username.length >= 3) fuelLevel += 50;
       if (data.password.length >= 6) fuelLevel += 50;
     } else {
-      if (data.fullName.length >= 2) fuelLevel += 20;
-      if (data.username.length >= 3) fuelLevel += 20;
-      if (data.email.includes('@')) fuelLevel += 20;
-      // Remove phone requirement for parents
-      if (data.password.length >= 6) fuelLevel += 20;
-      if (data.password === data.password_confirmation && data.password.length >= 6) fuelLevel += 20;
+      // Đối với học sinh, chia đều 6 trường thông tin (100/6 ≈ 16.67% mỗi trường)
+      if (accountType.id === 'student') {
+        if (data.fullName.length >= 2) fuelLevel += 16.67;
+        if (data.username.length >= 3) fuelLevel += 16.67;
+        if (data.email.includes('@')) fuelLevel += 16.67;
+        if (data.password.length >= 6) fuelLevel += 16.67;
+        if (data.password === data.password_confirmation && data.password.length >= 6) fuelLevel += 16.67;
+        if (data.parentEmail.includes('@')) fuelLevel += 16.67;
+      } else {
+        // Logic cũ cho giáo viên và phụ huynh
+        if (data.fullName.length >= 2) fuelLevel += 20;
+        if (data.username.length >= 3) fuelLevel += 20;
+        if (data.email.includes('@')) fuelLevel += 20;
+        // Remove phone requirement for parents
+        if (data.password.length >= 6) fuelLevel += 20;
+        if (data.password === data.password_confirmation && data.password.length >= 6) fuelLevel += 20;
+      }
     }
     
-    return fuelLevel;
+    return Math.min(100, Math.round(fuelLevel * 100) / 100); // Làm tròn đến 2 chữ số thập phân và giới hạn tối đa 100
   };
 
   // Update form data and fuel
@@ -77,6 +89,11 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
       // Remove phone validation for parents
       if (formData.password !== formData.password_confirmation) {
         newErrors.password_confirmation = 'Mật khẩu xác nhận không khớp!';
+      }
+      
+      // Đối với học sinh, thêm kiểm tra email phụ huynh
+      if (accountType.id === 'student' && !formData.parentEmail) {
+        newErrors.parentEmail = 'Cần email của phụ huynh!';
       }
     }
     
@@ -164,6 +181,20 @@ const SpaceshipForm = ({ accountType, onSubmit, onBack, isLoading, formType = 'l
                     error={errors.email}
                     placeholder="email@example.com"
                   />
+                  
+                  {/* Thêm trường nhập email phụ huynh cho học sinh */}
+                  {accountType.id === 'student' && (
+                    <ControlPanel
+                      icon={<FaUser />}
+                      label="Email của phụ huynh"
+                      name="parentEmail"
+                      type="email"
+                      value={formData.parentEmail}
+                      onChange={(e) => updateField('parentEmail', e.target.value)}
+                      error={errors.parentEmail}
+                      placeholder="Email của phụ huynh"
+                    />
+                  )}
 
                   {/* Remove phone field for parents */}
                 </>
