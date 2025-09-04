@@ -15,4 +15,11 @@ class Grade extends Model
     public function lessons() {
         return $this->hasMany(Lesson::class);
     }
+        // Mỗi khối có nhiều học sinh
+    public function students()
+    {
+        return $this->hasMany(User::class, 'grade_id'); 
+        // giả sử bảng users có cột grade_id
+    
+    }
 }

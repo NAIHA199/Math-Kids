@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ProgressController;;
 use App\Http\Controllers\Api\RewardController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\ResultController;
+use App\Http\Controllers\Api\GradeController;
 //Route đăng nhập, đăng ký và đăng xuất
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,7 +31,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //Route quên và reset mật khẩu
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
-
+//Route Grade
+Route::get('/grades', [GradeController::class, 'index']);
 //Route bài học
 
 Route::get('/lessons/{id}/sections', [LessonController::class, 'getLessonWithSections']);

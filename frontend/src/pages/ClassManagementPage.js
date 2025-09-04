@@ -1,12 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 import SpaceBackground from '../components/ui/SpaceBackground';
-
-const UsersIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-  </svg>
-);
 
 const BookOpenIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -15,13 +9,33 @@ const BookOpenIcon = () => (
 );
 
 const ClassManagementPage = () => {
-  const mockClasses = [
-    { id: 'C01', name: 'Lớp 3A', studentCount: 25, currentLesson: 'Phép nhân 2 chữ số', progress: 65, color: 'from-blue-500 to-indigo-600' },
-    { id: 'C02', name: 'Lớp 4B', studentCount: 20, currentLesson: 'Phân số cơ bản', progress: 80, color: 'from-green-500 to-teal-600' },
-    { id: 'C03', name: 'Lớp 5C', studentCount: 22, currentLesson: 'Số thập phân', progress: 45, color: 'from-yellow-500 to-orange-600' },
-    { id: 'C04', name: 'Lớp 3B', studentCount: 28, currentLesson: 'Phép chia có dư', progress: 30, color: 'from-red-500 to-pink-600' },
-  ];
-  const [classes, setClasses] = useState(mockClasses);
+  const [classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/grades")
+      .then((res) => res.json())
+      .then((data) => {
+        const grades = data.data || data;
+
+        const mapped = grades.map((g, idx) => ({
+          id: g.id,
+          name: g.name,
+          studentCount: g.students_count || 0,
+          lessonCount: g.lessons_count || 0,
+          currentLesson: g.lessons_count > 0 ? `${g.lessons_count} bài học` : "Chưa có bài học",
+          progress: 0, // TODO: cập nhật theo tiến trình thật nếu backend có
+          color: [
+            'from-blue-500 to-indigo-600',
+            'from-green-500 to-teal-600',
+            'from-yellow-500 to-orange-600',
+            'from-red-500 to-pink-600',
+          ][idx % 4]
+        }));
+
+        setClasses(mapped);
+      })
+      .catch((err) => console.error("Fetch error:", err));
+  }, []);
 
   const handleDelete = (classId) => {
     setClasses(classes.filter(c => c.id !== classId));
@@ -29,18 +43,17 @@ const ClassManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Space Background */}
       <SpaceBackground />
-      
       <AuthenticatedNavbar user={{ role: 'teacher' }} />
-      
+
       <div className="relative z-10 pt-20 px-4 sm:px-6 lg:px-8 pb-12">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Quản lý lớp học</h1>
             <p className="text-gray-400">Quản lý các lớp học và theo dõi tiến trình của học sinh</p>
           </div>
-          
+
+          {/* Cards hiển thị theo dữ liệu thật */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {classes.map((classItem) => (
               <div key={classItem.id} className={`bg-gradient-to-br ${classItem.color} rounded-xl p-6 shadow-lg`}>
@@ -58,14 +71,14 @@ const ClassManagementPage = () => {
                     </svg>
                   </button>
                 </div>
-                
+
                 <div className="mb-4">
                   <div className="flex items-center text-white/90 mb-1">
                     <BookOpenIcon />
                     <span className="text-sm">{classItem.currentLesson}</span>
                   </div>
                 </div>
-                
+
                 <div className="bg-white/20 rounded-full h-2 mb-2">
                   <div 
                     className="bg-white rounded-full h-2" 
@@ -78,7 +91,7 @@ const ClassManagementPage = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="mt-8 text-center">
             <button className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
               + Thêm lớp học mới
