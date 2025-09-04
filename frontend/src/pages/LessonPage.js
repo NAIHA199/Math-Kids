@@ -70,27 +70,51 @@ export default function LessonPage() {
       });
   }, [lessonId]);
 
-  // Lưu hoàn thành
-  const handleComplete = async () => {
+    // Lưu hoàn thành
+    const handleComplete = async () => {
     try {
-      await fetch("http://localhost:8000/api/completions/upsert", {
+        // Tính progress theo section
+        const progressPercent = Math.round(((currentSection + 1) / sections.length) * 100);
+
+        // Nếu có câu hỏi => tính score %
+        let scorePercent = null;
+        if (sections.some(sec => sec.type === "practice")) {
+        const practiceSections = sections.filter(sec => sec.type === "practice");
+        let totalQ = 0, correctQ = 0;
+
+        practiceSections.forEach(sec => {
+            const questions = parseQuestions(sec.questions);
+            questions.forEach((q, i) => {
+            totalQ++;
+            if (userAnswers[i] === q.correct) correctQ++;
+            });
+        });
+
+        if (totalQ > 0) {
+            scorePercent = Math.round((correctQ / totalQ) * 100);
+        }
+        }
+
+        await fetch("http://localhost:8000/api/completions/upsert", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          completable_type: "lesson",
-          completable_id: lessonId,
-          stars: 1,
+            completable_type: "lesson",
+            completable_id: lessonId,
+            progress: progressPercent,
+            score: scorePercent,
         }),
-      });
-      toast.success("🎉 Hoàn thành bài học!");
-      navigate("/student-home");
+        });
+
+        toast.success("🎉 Hoàn thành bài học!");
+        navigate("/student-home");
     } catch {
-      toast.error("Lỗi khi lưu tiến trình!");
+        toast.error("Lỗi khi lưu tiến trình!");
     }
-  };
+    };
 
   const handleAnswer = (qIndex, optIndex) => {
     setUserAnswers((prev) => ({ ...prev, [qIndex]: optIndex }));

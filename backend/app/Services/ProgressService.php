@@ -20,33 +20,49 @@ class ProgressService
      * - Nếu chưa có record => tạo mới
      * - Nếu đã có => cập nhật số sao (chỉ tăng, không giảm)
      */
-    public function recordCompletion(User $user, string $completableType, int $completableId, int $stars = 1): Completion
-    {
+    public function recordCompletion(
+        User $user,
+        string $completableType,
+        int $completableId,
+        ?int $progress = null,
+        ?int $score = null
+    ): Completion {
         $completion = Completion::firstOrNew([
             'user_id'          => $user->id,
             'completable_type' => $completableType,
             'completable_id'   => $completableId,
         ]);
 
-        // Nếu record mới thì gán trực tiếp
+        // Nếu mới tạo thì set cơ bản
         if (!$completion->exists) {
-            $completion->stars = $stars;
             $completion->status = 'completed';
             $completion->completed_at = Carbon::now();
-            $completion->save();
-        } else {
-            // Nếu đã có → chỉ update khi số sao mới cao hơn
-            if ($stars > $completion->stars) {
-                $completion->stars = $stars;
-                $completion->save();
-            }
         }
-        // Gọi ResultService để cập nhật tổng hợp tiến trình / phần thưởng
+
+        // Cập nhật progress/score
+        if ($progress !== null) {
+            $completion->progress = $progress;
+        }
+        if ($score !== null) {
+            $completion->score = $score;
+        }
+
+        // Tính lại số sao dựa trên progress/score
+        $oldStars = $completion->stars ?? 0;
+        $completion->recalcStars();
+
+        // Chỉ update nếu sao mới ≥ sao cũ
+        if ($completion->stars < $oldStars) {
+            $completion->stars = $oldStars;
+        }
+
+        $completion->save();
+
+        // Cập nhật tổng hợp
         $this->resultService->updateProgress($user);
 
         return $completion;
     }
-
     /**
      * Lấy tất cả completion của user
      */
