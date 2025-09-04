@@ -173,6 +173,8 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/lessons/:lessonId" element={<LessonPage />} />
+
           <Route path="/games" element={
             <ProtectedRoute allowedRoles={['student']}>
               <GamePage />

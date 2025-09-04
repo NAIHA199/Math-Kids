@@ -32,9 +32,13 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
 //Route bài học
+
+Route::get('/lessons/{id}/sections', [LessonController::class, 'getLessonWithSections']);
 Route::get('/lessons', [LessonController::class, 'index']);
 Route::get('/lessons/{id}', [LessonController::class, 'show']);
-Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);
+Route::get('/lessons/{id}/full', [LessonController::class, 'getLessonFull']);  // API này cần cho frontend
+Route::get('/lessons/{lessonId}/sections', [LessonController::class, 'getLessonWithSections']);
+
 
 //Route bài tập
 Route::get('/exercises', [ExerciseController::class, 'index']);
