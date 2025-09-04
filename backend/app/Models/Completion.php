@@ -47,14 +47,12 @@ class Completion extends Model
         // Nếu có score thì ưu tiên tính theo score, không thì dùng progress
         $value = $score > 0 ? $score : $progress;
 
-        if ($value >= 90) {
-            $this->stars = 3;
-        } elseif ($value >= 70) {
-            $this->stars = 2;
-        } elseif ($value >= 50) {
+        // ⭐ Chỉ 100% mới có sao
+        if ($value >= 100) {
             $this->stars = 1;
         } else {
             $this->stars = 0;
         }
     }
+
 }

@@ -22,45 +22,33 @@ class CompletionController extends Controller
     public function upsert(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'completable_type' => 'required|string', // Lesson, Game, Exercise
+            'completable_type' => 'required|string',
             'completable_id'   => 'required|integer',
             'progress'         => 'nullable|integer|min:0|max:100',
             'score'            => 'nullable|integer|min:0|max:100',
+            'status'           => 'nullable|string',
         ]);
 
         $user = $request->user();
         $completableTypeClass = 'App\\Models\\' . ucfirst($data['completable_type']);
 
-        // Tính số sao dựa vào progress hoặc score
-        $stars = 0;
-        $value = $data['score'] ?? $data['progress'] ?? 0;
-
-        if ($value >= 90) {
-            $stars = 3;
-        } elseif ($value >= 70) {
-            $stars = 2;
-        } elseif ($value >= 50) {
-            $stars = 1;
-        }
-
+        // Gọi ProgressService → nó sẽ tự recalc stars
         $completion = $this->progressService->recordCompletion(
             $user,
             $completableTypeClass,
             $data['completable_id'],
-            $stars
+            $data['progress'] ?? 0,
+            $data['score'] ?? 0,
+            $data['status'] ?? 'completed'
         );
-
-        // Lưu thêm progress/score vào completion
-        $completion->progress = $data['progress'] ?? null;
-        $completion->score    = $data['score'] ?? null;
-        $completion->save();
 
         return response()->json([
             'success' => true,
-            'message' => "Hoàn thành {$data['completable_type']} với {$completion->stars} sao.",
+            'message' => "Đã lưu tiến trình {$data['completable_type']}.",
             'data'    => $completion
         ]);
     }
+
 
     /**
      * Lấy tất cả tiến trình của user

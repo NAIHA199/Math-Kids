@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AuthenticatedNavbar from "../components/layout/AuthenticatedNavbar";
 import SpaceBackground from "../components/ui/SpaceBackground";
+import { startOptimizedAppearAnimation } from "framer-motion";
 
 // Icon SVG
 const FaArrowLeft = () => (
@@ -95,6 +96,14 @@ export default function LessonPage() {
         }
         }
 
+        // ⭐ Tính số sao dựa trên progress / score
+        let stars = 0;
+        if (progressPercent === 100) {
+        const value = scorePercent ?? progressPercent; // ưu tiên score nếu có
+        if (value === 100) stars = 1;
+        else stars = 0;
+        }
+
         await fetch("http://localhost:8000/api/completions/upsert", {
         method: "POST",
         headers: {
@@ -106,15 +115,18 @@ export default function LessonPage() {
             completable_id: lessonId,
             progress: progressPercent,
             score: scorePercent,
+            status: "completed",
+            stars: stars, // ⭐ gửi kèm số sao
         }),
         });
 
-        toast.success("🎉 Hoàn thành bài học!");
+        toast.success(`🎉 Hoàn thành bài học! Bạn đạt ${stars} ⭐`);
         navigate("/student-home");
     } catch {
         toast.error("Lỗi khi lưu tiến trình!");
     }
     };
+
 
   const handleAnswer = (qIndex, optIndex) => {
     setUserAnswers((prev) => ({ ...prev, [qIndex]: optIndex }));
