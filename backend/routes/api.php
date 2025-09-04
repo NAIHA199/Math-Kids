@@ -50,6 +50,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/exercises/{exercise}', [ExerciseController::class, 'show']);
     Route::put('/exercises/{exercise}', [ExerciseController::class, 'update']);
     Route::delete('/exercises/{exercise}', [ExerciseController::class, 'destroy']);});
+    Route::post('/exercises/create-seeder', [ExerciseController::class, 'createFromSeeder'])
+    ->middleware('auth:sanctum'); // nếu dùng auth
+
 //Route game
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/games', [GameController::class, 'index']);

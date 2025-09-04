@@ -80,6 +80,49 @@ const ExerciseManagementPage = () => {
 
       <div className="relative z-10 pt-20 px-4 sm:px-6 lg:px-8 pb-12">
         <div className="max-w-7xl mx-auto">
+          
+          {/* --- Nút tạo bài tập mới --- */}
+          <div className="flex justify-between items-center mb-4 px-6 py-4">
+            <h2 className="text-xl font-bold">Danh sách bài tập</h2>
+            <button
+              onClick={async () => {
+                if (!window.confirm("Tạo bài tập mới tự động?")) return;
+                try {
+                  const exerciseData = {
+                    title: `Bài tập mới ${Date.now()}`,
+                    lesson_id: 1, // Chọn lesson phù hợp
+                    type: "practice",
+                    description: "Bài tập tự động tạo",
+                    difficulty: "easy",
+                    time: "10 phút",
+                    questions: [
+                      { question: "1 + 1 = ?", options: ["1","2","3","4"], correct: 1 },
+                      { question: "2 + 3 = ?", options: ["4","5","6","7"], correct: 1 }
+                    ]
+                  };
+                  const res = await fetch("http://localhost:8000/api/exercises", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(exerciseData),
+                  });
+                  if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
+                  const newExercise = await res.json();
+                  setExercises(prev => [...prev, newExercise]);
+                  alert("🎉 Tạo bài tập thành công!");
+                } catch (err) {
+                  console.error(err);
+                  alert("❌ Lỗi khi tạo bài tập!");
+                }
+              }}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg"
+            >
+              Tạo bài tập mới
+            </button>
+          </div>
+
           <div className="bg-gray-800 shadow-xl rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full">
@@ -127,6 +170,7 @@ const ExerciseManagementPage = () => {
               </table>
             </div>
           </div>
+
         </div>
       </div>
     </div>
