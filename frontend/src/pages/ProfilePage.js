@@ -6,12 +6,46 @@ import { useAuth } from '../hooks/useAuth';
 // Import components
 import AuthenticatedNavbar from '../components/layout/AuthenticatedNavbar';
 import Footer from '../components/layout/Footer';
+import { useEffect, useState } from 'react';
 
 const ProfilePage = () => {
   const { getCurrentUser } = useAuth();
   const user = getCurrentUser();
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+  lessonsCompleted: 0,
+  exercisesCompleted: 0,
+  gamesCompleted: 0,
+  });
 
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/my-stats', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+      
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+          .then(response => response.json())
+          .then(response => setStats(response.stats))
+          .catch(error => {
+            console.error("API error (rewards/summary):", error);
+            setStats({ stars: 0, level: 0, streak: 0 });
+          });
+            const data = await res.json();
+        if (data.success) {
+          setStats(data.data);
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải thống kê:", err);
+      }
+    };
+
+    fetchStats();
+  }, []);
   // Hàm lấy thông tin hiển thị người dùng theo vai trò
   const getUserDisplay = () => {
     switch(user?.role) {
@@ -170,7 +204,7 @@ const ProfilePage = () => {
                         
                         <div className="flex justify-between items-center">
                           <span>Trò chơi đã chơi</span>
-                          <span className="font-bold text-purple-400">0</span>
+                          <span className="font-bold text-purple-400">{stats.gamesCompleted}</span>
                         </div>
                         
                         <div className="flex justify-between items-center">

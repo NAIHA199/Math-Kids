@@ -43,13 +43,13 @@ const CuocDuaXuyenKhong = ({ onBack, onComplete }) => {
 
     // 🔥 Hàm tính số sao dựa trên điểm
     const calculateStars = (finalScore) => {
-        return Math.min(3, Math.floor(finalScore / 50));
+        return Math.floor(finalScore / 10);
     };
 
     const handleGameOver = () => {
         setGameState('gameOver');
         const stars = calculateStars(score);
-        onComplete?.(2, stars); // 👈 gameId = 5
+        onComplete?.(2, stars); // 
     };
     const handleVictory = () => {
         setGameState('gameOver');

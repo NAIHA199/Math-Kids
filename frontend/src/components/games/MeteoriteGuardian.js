@@ -46,7 +46,7 @@ const MeteoriteGuardian = ({ onBack, onComplete }) => {
   }, []);
 
   // 50 điểm = 1 sao, tối đa 3 sao
-  const calculateStars = (finalScore) => Math.min(3, Math.floor(finalScore / 50));
+  const calculateStars = (finalScore) => Math.floor(finalScore / 1);
 
   // Tạo meteors dùng level được truyền
   const createMeteors = useCallback((correctAnswer, lvl) => {

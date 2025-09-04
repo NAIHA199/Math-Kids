@@ -203,13 +203,13 @@ const BanMayBayToanHoc = ({ game, onBack, onComplete }) => {
 
                 if (hitEnemy.isCorrect) {
                     toast.success('Chính xác!');
-                    setStarsEarned(prevStars => prevStars + 1);
+                    setStarsEarned(prevStars => prevStars + 5);
                    
                     setLevel(l => {
                             const newLevel = l + 1;
                             if (newLevel > 20) {
                                 setGameState('victory');
-                                onComplete?.(4, starsEarned + 1);
+                                onComplete?.(4, starsEarned + 5);
                             } else {
                                 generateQuestionForLevel(newLevel);
                             }
