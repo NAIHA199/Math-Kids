@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FaArrowLeft } from 'react-icons/fa';
@@ -19,14 +19,16 @@ const RegisterPage = () => {
   const [selectedAccountType, setSelectedAccountType] = useState(null);
 
   const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
     const type = searchParams.get('type');
-    if (type === 'student') {
+    const state = location.state;
+    if (type === 'student' || (state && state.role === 'student')) {
       setSelectedAccountType({ id: 'student', name: 'Học sinh' });
       setCurrentStep('registerForm');
     }
-  }, [searchParams]);
+  }, [searchParams, location.state]);
 
   // Handle account type selection
   const handleAccountTypeSelect = (type) => {

@@ -46,7 +46,7 @@ const PublicRoute = ({ children }) => {
   const user = getCurrentUser();
   const location = useLocation();
   if (user) {
-    if (location.pathname === '/register' && user.role !== 'parent') {
+    if (location.pathname === '/register' && (user.role !== 'parent' || user.role === 'parent')) {
       return children;
     }
     switch(user.role) {
